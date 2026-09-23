@@ -1,13 +1,13 @@
 \subsection{Frozen representations recover anatomy in held-out sections}
 \label{sec:dual-view-identification}
 
-Frozen ZoomST representations distinguish anatomical compartments on sections excluded from pretraining. We compare whole-section clustering with atlas annotations across all eight held-out MOSTA sections. Molecular features concatenate $e_8,e_{32},e_{128}$, spatial features concatenate $g_8,g_{32},g_{128}$, and joint features combine both views. All pretrained encoders remain frozen; the target-section readouts are specified in Appendix~\ref{app:dual-view}.
+Zero-shot transfer remains a challenge for pretrained models in single-cell biology~\citep{kedzierska2025zeroshot}. We therefore first evaluate ZoomST's zero-shot representation transfer to eight MOSTA sections excluded from pretraining. With encoder weights fixed, we compare whole-section clustering of molecular, spatial, and joint features with atlas annotations (Appendix~\ref{app:dual-view}).
 
-Joint ZoomST features achieve higher AMI than the evaluated public pretrained baselines on every held-out section, with an equal-section mean of 0.577, and remain competitive with target-fitted spatial methods (Table~\ref{tab:representation-summary}). The same features retain 52.7\% of physical 32-nearest neighbors on average, linking anatomical agreement to local spatial organization. The matched-update No Cross model has similar mean AMI (0.575), but lower neighbor retention (50.4\%). Thus, the full model retains anatomical discrimination while improving local spatial correspondence relative to this ablation.
+Joint ZoomST features achieve higher AMI than the evaluated public pretrained baselines on every held-out section, with an equal-section mean of 0.577, and remain competitive with target-fitted spatial methods (Table~\ref{tab:representation-summary}a).
 
 \begin{table}[!htbp]
 \centering\small
-\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI as mean $\pm$ sample SD over clustering seeds 42, 43, and 44; the summary averages sections equally within each seed. \textbf{(b)} Equal-section mean recovery of physical 32-nearest neighbors. Molecular and Spatial Views each concatenate three granularities; Joint combines both. No Cross uses the same joint readout and total training updates without cross-granularity supervision. Pretrained encoders are frozen. Bold marks the top three unrounded values per row, including third-place ties. Protocol: Appendix~\ref{app:dual-view}.}
+\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI as mean $\pm$ sample SD over clustering seeds 42, 43, and 44; the summary averages sections equally within each seed. \textbf{(b)} Equal-section mean recovery of physical 32-nearest neighbors. Molecular and Spatial Views are separate readouts of ZoomST; Joint combines them. Pretrained encoders are frozen. Bold marks the top three unrounded values per row, including third-place ties. Protocol: Appendix~\ref{app:dual-view}.}
 \label{tab:representation-summary}
 \label{tab:dual-view-sections}
 \setlength{\tabcolsep}{0.8pt}
@@ -15,12 +15,14 @@ Joint ZoomST features achieve higher AMI than the evaluated public pretrained ba
 \input{tables/representation_summary}
 \end{table}
 
-The held-out E16.5 E2S13 Brain case illustrates the complementary information in the two views (Figure~\ref{fig:dual-view-brain}). Molecular features recover most Brain positions but include neighboring tissue; spatial features make fewer extra assignments but miss part of the Brain. Joint features reduce this tradeoff, increasing Brain IoU from 0.884 for $e$ and 0.905 for $g$ to 0.962. Whole-section maps and section-wise spatial retention are provided in Figures~\ref{fig:dual-view-e125} and~\ref{fig:dual-view-retention}. These results establish a transferable representation base from which to assess the additional value of learning granularity relationships.
+To connect anatomical recognition to tissue organization, we next test whether locations that are close in physical space remain neighbors in the learned features. Joint features recover 52.7\% of physical 32-nearest neighbors on average, compared with 50.2\% for the molecular view and 52.3\% for the spatial view (Table~\ref{tab:representation-summary}b). The section-wise results show how this local spatial correspondence varies across held-out tissues (Figure~\ref{fig:dual-view-retention}).
+
+Whole-section maps complement these aggregate measures by showing the spatial correspondence between recovered tissue assignments and atlas-defined compartments in E12.5 E2S1 (Figure~\ref{fig:dual-view-e125}). The held-out E16.5 E2S13 Brain case further shows how the two views make complementary errors (Figure~\ref{fig:dual-view-brain}). Molecular features recover most Brain positions but include neighboring tissue; spatial features make fewer extra assignments but miss part of the Brain. Combining the views reduces this tradeoff, increasing Brain IoU from 0.884 for the molecular view and 0.905 for the spatial view to 0.962.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/brain_complementarity.pdf}
-\caption{\textbf{Complementary molecular and spatial errors on a held-out section.} Annotation, molecular, spatial, and joint Brain assignments in E16.5 E2S13. Blue: correct assignments; orange: extra assignments; magenta: missed Brain. All maps use the same whole-section readout and seed 42. Each feature set combines its respective training granularities.}
+\caption{\textbf{Complementary molecular and spatial errors on a held-out section.} Annotation, molecular, spatial, and joint Brain assignments in E16.5 E2S13. Blue: correct assignments; orange: extra assignments; magenta: missed Brain. All maps use the same whole-section readout and seed 42.}
 \label{fig:dual-view-brain}
 \end{figure}
 \FloatBarrier
