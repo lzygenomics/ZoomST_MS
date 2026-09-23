@@ -1,0 +1,23 @@
+\section{Matched continuation study}
+\label{app:objective-ablation}
+
+Matched continuation evaluates native cross-granularity correspondence on three adapted sections using one training seed. Section assignments are listed in Table~\ref{tab:evaluation_protocol}. Both readouts use the same queries and candidates across objective settings; contrasts compare CS with base-only continuation and CS+MMD with CS across all nine section--direction conditions.
+
+\paragraph{Sections and matched continuations.}
+E12.5 E2S1, E14.5 E1S1, and E16.5 E1S1 contain 23,640, 102,519, and 121,767 positions. Each of the three objective settings in Section~\ref{sec:objective-ablation} is adapted separately on each section for 2,000 updates, with batch size 32 and training seed 42. Every continuation starts from the same base-pretrained checkpoint with a fresh optimizer and a common learning-rate schedule. The encoder is trainable; settings with cross-granularity supervision use the same shared ODE transition. The base-only setting trains the retained encoders without a transition objective. CS and JointMMD have final weight one when included. Evaluation uses the final checkpoint after the matched update budget.
+
+\paragraph{Native neighborhood overlap.}
+We select $Q=2{,}048$ query positions at evenly spaced original row indices and retain every section position as a candidate. Let $N_{32}^{a}(i)$ denote the 32 nearest positions to $e_{i,a}$ within the native scale-$a$ array, excluding row $i$. With an analogous set for scale $b$, the readout is
+\[
+R_{32}^{a,b}=\frac1Q\sum_{i\in\mathcal Q}
+\frac{|N_{32}^{a}(i)\cap N_{32}^{b}(i)|}{32}.
+\]
+Both neighbor searches use exact Euclidean distances in the original 256-dimensional molecular states. Exact ties are resolved by original row index. The readout compares the local similarity relationships of two retained representations.
+
+\paragraph{Native paired retrieval.}
+For the same queries, rank every native coarse state $e_{j,b}$ by its Euclidean distance to the native fine query $e_{i,a}$. The correct candidate is $j=i$, which remains in the gallery. Writing this candidate's rank as $r_i^{a\to b}$, define
+\[
+\operatorname{Recall@32}^{a\to b}=\frac1Q\sum_{i\in\mathcal Q}
+\mathbf1[r_i^{a\to b}\leq32].
+\]
+Exact ties again use original row index. The readout uses the retained molecular states directly, with no fitted alignment or transformation in the query. It assesses position identity without anatomical labels. Candidate counts differ between sections, so objective increments are compared within each section.

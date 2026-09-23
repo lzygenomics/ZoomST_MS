@@ -1,0 +1,116 @@
+\section{Architecture and optimization}
+\label{app:hyperparameters}
+
+\subsection{Backbone and within-granularity learning}
+
+Both representation views have width 256. The position-wise and pseudobulk encoders each use two Transformer layers and eight attention heads, with separate Transformer parameters and shared gene and expression-bin embeddings. The spatial-context Transformer has four layers and eight attention heads and is shared across granularities. The DeepSets maps $\phi$ and $\rho$ each use layer normalization and a two-layer multilayer perceptron with hidden width 512, GELU activation, and dropout 0.1. The same maps are applied at each granularity.
+
+For clarity, the pooled profile and spatial set readout are
+\begin{equation}
+m_{i,r}=r^{-1}\sum_{j\in S_{i,r}}\bar x_j,\qquad
+ g_{i,r}=\rho\!\left(r^{-1}\sum_{j\in S_{i,r}}\phi(H_{ij,r})\right).
+\label{eq:neighborhood-profile}
+\end{equation}
+The base objective combines reconstruction with same-support view alignment:
+\begin{equation}
+\mathcal L_{\mathrm{base}}=\mathcal L_{\mathrm{rec}}+
+\frac{\lambda_{\mathrm{view}}}{|\Rset|}\sum_{r\in\Rset}\mathcal L_{\mathrm{VICReg}}(e_r,g_r).
+\label{eq:base-objective}
+\end{equation}
+Here $e_r,g_r$ collect the sampled centers at granularity $r$.
+
+The molecular view averages preprocessed expression over the neighborhood before selecting up to 512 gene tokens and assigning expression bins. There are 31 nonzero expression bins and one padding bin. Reconstruction masks gene and value identities together at 30\% of visible nonzero token positions, with at most 154 queries per profile. A shared gene-bin decoder predicts the expression-bin targets, and only masked nonzero targets contribute to the reconstruction loss. With branch weights one,
+\begin{equation}
+\mathcal L_{\mathrm{rec}}
+=\mathcal L_{\mathrm{center}}
++\frac{1}{|\Rset|}\sum_{r\in\Rset}
+\left(\mathcal L_{g,r}^{\mathrm{PB}}+\mathcal L_{e,r}^{\mathrm{PB}}\right).
+\label{eq:reconstruction-objective}
+\end{equation}
+The neighborhood losses reconstruct the pooled expression profile from the spatial and molecular states, respectively. Within-granularity VICReg is applied directly to these states, with invariance, variance, and covariance weights $(1,1,0.04)$ and outer weight $\lambda_{\mathrm{view}}=0.1$ in Equation~\ref{eq:base-objective}.
+
+\subsection{Shared field and numerical integration}
+
+For state $z\in\mathbb R^{256}$ and granularity coordinate $u$, the field is
+\begin{equation}
+f_\theta(z,u)
+=W_2\,\operatorname{GELU}\!\left(
+W_1[\operatorname{LN}(z);u]+b_1\right)+b_2,
+\label{eq:ode-field-network}
+\end{equation}
+where $W_1\in\mathbb R^{128\times 257}$ and $W_2\in\mathbb R^{256\times 128}$. The field has 66,560 trainable parameters, including layer normalization. Both $W_2$ and $b_2$ are initialized to zero. The transition is evaluated in single precision, and gradients are propagated through the numerical integration steps.
+
+For $u_a=u(a)$ and $u_b=u(b)$, integration uses uniform steps within each query interval, with $n=\max(1,\lceil |u_b-u_a|/0.25\rceil)$ and step size $h=(u_b-u_a)/n$. A zero-length interval returns its input. A fourth-order Runge--Kutta step from $(u,z)$ is
+\begin{equation}
+\begin{aligned}
+k_1&=f_\theta(z,u),\\
+k_2&=f_\theta(z+hk_1/2,u+h/2),\\
+k_3&=f_\theta(z+hk_2/2,u+h/2),\\
+k_4&=f_\theta(z+hk_3,u+h),\\
+z^{+}&=z+\frac h 6(k_1+2 k_2+2 k_3+k_4).
+\end{aligned}
+\label{eq:rk4-transition}
+\end{equation}
+The training intervals $8\to 32$, $32\to 128$, and $8\to 128$ use two, two, and four steps, respectively.
+
+The coordinate satisfies $u=\log_2(r/8)/4$, so the field per unit $\log_2 r$ is $f_\theta/4$. Equation~\ref{eq:granularity-response} uses the corresponding finite-interval normalization to compare response magnitudes across intervals of different widths.
+
+\subsection{Coarse-support regression}
+
+For a focal center $i$ and pair $(a,b)$, all $b$ positions in $S_{i,b}$ contribute a source state. Each state $e_{j,a}$ is encoded from the fine neighborhood centered at $j$. The observed target is $y=\stopgrad(e_{i,b})$, the current encoder's clean coarse state. Write $q_j=T_{a\to b}(e_{j,a})$ and $\bar q=b^{-1}\sum_{j\in S_{i,b}}q_j$. The loss for this support decomposes as
+\begin{equation}
+\frac{1}{bd}\sum_{j\in S_{i,b}}\|q_j-y\|_2^2
+=\frac{\|\bar q-y\|_2^2}{d}
++\frac{1}{bd}\sum_{j\in S_{i,b}}\|q_j-\bar q\|_2^2.
+\label{eq:consensus-decomposition}
+\end{equation}
+The cross term vanishes because $\sum_j(q_j-\bar q)=0$. Thus, the objective combines mean-to-target alignment and within-support prediction consensus. Every source is transformed before its error is computed. Losses are averaged within each support and then equally across focal centers and the three granularity pairs. The target is detached, while the predicted states carry gradients to the field and source encoder.
+
+\subsection{Projected product-kernel MMD}
+
+A fixed projection with orthonormal rows maps each 256-dimensional state to 16 dimensions and is stored with the model. For one granularity pair, define
+\begin{equation}
+s_i=\Pi\stopgrad(e_{i,a}),\qquad
+q_i=\Pi T_{a\to b}(e_{i,a}),\qquad
+t_i=\Pi\stopgrad(e_{i,b}).
+\end{equation}
+With the stop-gradient notation of the main text, the empirical joint measures are
+\begin{equation}
+\begin{aligned}
+\widehat P_{ab}^{T,\Pi}
+&=\frac{1}{B}\sum_{i=1}^{B}
+\delta_{(\Pi\stopgrad(e_{i,a}),\,\Pi T_{a\to b}(e_{i,a}))},\\
+\widehat P_{ab}^{\Pi}
+&=\frac{1}{B}\sum_{i=1}^{B}
+\delta_{(\Pi\stopgrad(e_{i,a}),\,\Pi y_{i,b})},
+\end{aligned}
+\label{eq:projected-joint-measures}
+\end{equation}
+where $\delta$ denotes a point mass. With $B$ focal-center samples, the biased empirical statistic used in Equation~\ref{eq:granularity-joint} is
+\begin{equation}
+\widehat{\operatorname{MMD}}_{ab}^{\,2}
+=\frac{1}{B^2}\sum_{i,j=1}^{B}
+\kappa_a(s_i,s_j)
+\left[\kappa_b(q_i,q_j)+\kappa_b(t_i,t_j)
+-2\kappa_b(q_i,t_j)\right].
+\label{eq:empirical-joint-mmd}
+\end{equation}
+We use multibandwidth radial basis function kernels
+\begin{equation}
+\kappa_r(v,w)
+=\frac{1}{3}\sum_{c\in\{0.5,1,2\}}
+\exp\!\left(-\frac{\|v-w\|_2^2}{2 c^2\sigma_r^2}\right).
+\label{eq:multibandwidth-rbf}
+\end{equation}
+The source bandwidth $\sigma_a^2$ is the median of positive pairwise squared distances among $s_i$, and the destination bandwidth $\sigma_b^2$ is computed from $t_i$. The bandwidth calculations are detached and use a lower bound of $10^{-6}$; if no positive distance is present, the bandwidth is set to one. The numerical kernel denominator is also lower-bounded by $10^{-6}$. Focal-center samples are gathered across devices before computing the statistic. Small negative values from numerical roundoff are clipped to zero, and the three granularity-pair statistics are averaged equally.
+
+The source coordinate in the product kernel is held fixed during each gradient calculation. The prediction is computed from the full 256-dimensional source state before projection, so its gradients update the source encoder as well as the transition. Observed coarse states are clean, same-step outputs of the current encoder, detached as regression and MMD targets. The projected statistic is the empirical penalty used to optimize the joint relationship in Equation~\ref{eq:granularity-equivariance}.
+
+\subsection{Joint optimization}
+
+The reconstruction and view-alignment objective initializes the representations and remains active during cross-granularity training. Both relation coefficients are increased to one during warmup. All three source--target granularity pairs receive equal final weight. Encoder and transition parameters are optimized together; clean encodings supply the relation losses, while reconstruction is evaluated on masked inputs. Pretraining uses molecular measurements and spatial coordinates without anatomical labels.
+
+
+For MOSTA, the base-pretrained encoder is followed by two joint-training epochs over 45 source sections, totaling 46,400 updates with a global batch of 160 (four devices, 40 centers per device). AdamW uses learning rates $2\times 10^{-4}$ for molecular and embedding parameters and $10^{-4}$ for the spatial context parameters, with respective weight decays 0.02, 0.01, and 0.05. Learning rates and the two relation weights warm up over 1,200 updates; cosine decay has a final learning-rate ratio of 0.1. Gradient norm is clipped at five. Backbone computation uses bfloat16 mixed precision and the ODE uses float32. Training uses seed 42; evaluation uses the final two-epoch checkpoint.
+
+The No Cross ablation continues training from the epoch-10 base-pretrained initialization for 46,400 updates using reconstruction and within-granularity view alignment without cross-granularity supervision. Including the 161,810 base-pretraining updates, both No Cross and the full model receive 208,210 updates in total. Evaluation uses the completed continuation for each model.

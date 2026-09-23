@@ -1,0 +1,61 @@
+\subsection{Continuous cross-granularity transformations}
+\label{sec:coarse-support}
+
+We parameterize a shared rule for representation change with a neural ODE~\citep{chen2018neuralode}. Its coordinate $u(r)=\log_2(r/8)/4$ maps granularities 8, 32 and 128 to $0,\tfrac12,1$; equal multiplicative changes span equal intervals. Starting from a molecular state at granularity $a$,
+\begin{equation}
+\frac{dz(u)}{du}=f_\theta(z(u),u),\qquad
+z(u(a))=e_{i,a},\qquad T_{a\to b}(e_{i,a})=z(u(b)).
+\label{eq:granularity-ode}
+\end{equation}
+The field receives the current state and absolute granularity coordinate, allowing changes to depend on both tissue context and observation range. Source and target granularities set the integration limits; every query uses the same parameters. The field is a multilayer perceptron initialized to zero, so training starts from identity transformations. We use fourth-order Runge--Kutta integration (Appendix~\ref{app:hyperparameters}).
+
+\subsection{Soft distributional equivariance from nested observations}
+\label{sec:granularity-supervision}
+
+Since broader context is not uniquely determined by the fine observation alone, we relate transformed and directly encoded coarse states through the soft statistical constraint~\citep{lenc2015equivariance}
+\begin{equation}
+\operatorname{Law}\bigl(Z_a,T_{a\to b}(Z_a)\bigr)
+\;\approx\;\operatorname{Law}(Z_a,Z_b),
+\label{eq:granularity-equivariance}
+\end{equation}
+where $(Z_a,Z_b)$ are directly encoded states at the same sampled location. Including the source preserves fine--coarse associations: shuffling coarse states changes their pairing while preserving their marginal distribution. Two complementary losses implement this relation.
+
+\paragraph{Coarse-support correspondence.}
+A coarse support supplies a common target for fine descriptions centered within it. For $B$ focal centers, define $y_{i,b}=\stopgrad(e_{i,b})$, where $\stopgrad$ stops gradients, and $\Pset=\{(8,32),(8,128),(32,128)\}$. We minimize
+\begin{equation}
+\mathcal L_{\mathrm{CS}}
+=\frac{1}{|\Pset|B}\sum_{(a,b)\in\Pset}\sum_{i=1}^{B}
+\frac{1}{bd}\sum_{j\in S_{i,b}}
+\left\|T_{a\to b}(e_{j,a})-y_{i,b}\right\|_2^2.
+\label{eq:coarse-support-loss}
+\end{equation}
+Each $e_{j,a}$ is encoded around its own center $j$ and transformed separately. This loss aligns the mean prediction to the coarse target and reduces within-support dispersion. Supports, centers and granularity pairs receive equal weight at their respective averaging levels.
+
+\paragraph{Joint association across locations.}
+For a fixed orthogonal projection $\Pi:\mathbb R^{256}\to\mathbb R^{16}$, let $\widehat P_{ab}^{T,\Pi}$ and $\widehat P_{ab}^{\Pi}$ be the empirical distributions of $(\Pi e_{i,a},\Pi T_{a\to b}(e_{i,a}))$ and $(\Pi e_{i,a},\Pi e_{i,b})$ over the same centers. Their squared maximum mean discrepancy~\citep{gretton2012mmd} gives
+\begin{equation}
+\mathcal L_{\mathrm{JointMMD}}=\frac{1}{|\Pset|}\sum_{(a,b)\in\Pset}
+\operatorname{MMD}_{\kappa_a\otimes\kappa_b}^2
+\!\left(\widehat P_{ab}^{T,\Pi},\widehat P_{ab}^{\Pi}\right).
+\label{eq:granularity-joint}
+\end{equation}
+The product of multibandwidth radial basis kernels compares source and destination jointly. Kernel source coordinates and observed targets are detached; gradients through predicted destinations update the transition and source encoder. Appendix~\ref{app:hyperparameters} gives the estimator and correspondence-loss decomposition.
+
+\subsection{Pretraining and continuous granularity queries}
+\label{sec:training-queries}
+
+After base pretraining, we jointly optimize the encoders and transition on the same source sections with
+\begin{equation}
+\mathcal L=\mathcal L_{\mathrm{base}}+\lambda_{\mathrm{CS}}\mathcal L_{\mathrm{CS}}
++\lambda_{\mathrm{J}}\mathcal L_{\mathrm{JointMMD}}.
+\label{eq:full-objective}
+\end{equation}
+The two cross-granularity weights warm up to one. Their inputs are clean molecular encodings; detached coarse targets come from the current encoder. All supervision uses 8, 32 and 128.
+
+After training, the encoders and transition are frozen. Retained views support tissue analysis, while $\widehat e_i(r\mid a)=T_{a\to r}(e_{i,a})$ queries trained or unseen target ranges. From a common source $a_0$, the normalized response
+\begin{equation}
+R_i(a,b\mid a_0)=\frac{\|\widehat e_i(b\mid a_0)-\widehat e_i(a\mid a_0)\|_2}
+{\sqrt d\,\log_2(b/a)}
+\label{eq:granularity-response}
+\end{equation}
+measures predicted change per doubling of context. We use this normalized predicted change to compare relative context sensitivity across locations.

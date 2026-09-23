@@ -1,0 +1,27 @@
+\subsection{Continuous transformations predict unseen states and reveal context sensitivity}
+\label{sec:scale-continuum}
+
+Continuous transformations predict tissue representations at observation ranges absent from training. Although supervised only at 8, 32 and 128, the frozen model predicts intermediate states from the same fine-scale source $e_{i,8}$. Predictions reduce target MSE in all 48 held-out section--granularity conditions. Averaging errors over the six unseen targets (12, 16, 24, 48, 64 and 96) within each section yields a mean section-level relative reduction of 21.96\% against unchanged $e_8$ (Appendix~\ref{app:unseen-state-detail}). Figure~\ref{fig:scale-continuum}A,B displays predictions and direct encodings at the unsupervised granularities 16 and 64 in a shared PCA space for E16.5 E1S1.
+
+With a shared frozen encoder, the neural ODE reduces mean unseen-granularity MSE by 10.86\% relative to a granularity-conditioned residual MLP, with lower error on every held-out section. Both heads use the same source representations and directly encoded targets (Appendix~\ref{app:transition-comparison}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/unseen_states_and_response.pdf}
+\caption{\textbf{Unseen-state predictions capture relative differences in representation change.} \textbf{A,B}, Direct encodings and predictions at unseen granularities 16 and 64 for 1,024 matched E16.5 E1S1 positions, using a shared PCA basis fitted on direct encodings at nine granularities. Full-dimensional $R^2$ is 0.941 and 0.876. \textbf{C}, Predicted versus directly encoded change over $64\to128$ in E14.5 E1S1 Facial nerve. Points show all 64 matched locations; axes report RMS representation change. All predictions start from $e_8$; 64 is unsupervised.}
+\label{fig:scale-continuum}
+\end{figure}
+\FloatBarrier
+
+Locations with higher predicted context responses (Equation~\ref{eq:granularity-response}) also show larger directly encoded changes. In the E14.5 E1S1 Facial nerve domain, predicted and directly encoded responses over $64\to128$ have a strong rank correlation across all 64 locations ($\rho=0.791$; Figure~\ref{fig:scale-continuum}C). This ordering extends beyond the illustrated case: the highest predicted-response quarter has larger mean encoded changes than the lowest in 31 of 32 held-out section--range conditions (Appendix~\ref{app:response-meaning}).
+
+In the Facial nerve example, this dependence corresponds to a shift from local nerve tissue toward its broader surroundings. Larger predicted responses accompany larger changes in annotated neighbor proportions over the same $64\to128$ range ($\rho=0.707$; Figure~\ref{fig:ode-context}A). In the highest-response quarter, expanding the neighborhood reduces the mean Facial nerve fraction from 71.4\% to 45.7\%; in the lowest-response quarter, it changes from 43.4\% to 36.2\% (Figure~\ref{fig:ode-context}B). High-response locations therefore undergo a larger shift away from a nerve-dominated neighborhood. At low-response locations, other tissues already occupy much of the smaller neighborhood, and expansion changes the mixture less. The response distinguishes these different dependencies on broader context among locations carrying the same anatomical label.
+
+Context dependence is spatially heterogeneous across E16.5 E1S1, as shown by the whole-section response map alongside observed composition changes (Figure~\ref{fig:ode-context}C,D). Within the broadly annotated Brain region, predicted responses track variation in directly encoded change even when neighborhood labels remain unchanged: at $8\to16$, 95 sampled locations have zero annotation TV and a predicted--encoded response Spearman correlation of $\rho=0.645$ (Appendix~\ref{app:response-meaning}). Context response therefore captures molecular-context variation beyond changes in broad annotation proportions.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/response_and_neighborhood_context.pdf}
+\caption{\textbf{Response distinguishes how tissue descriptions depend on surrounding context.} \textbf{A}, Predicted finite response versus annotation-composition change (total variation, TV) at all 64 E14.5 E1S1 Facial nerve locations over $64\to128$. \textbf{B}, Mean composition at 64 and 128 for the lowest and highest response quarters, following the same 16 locations per group. \textbf{C,D}, Whole-section maps for E16.5 E1S1: mean instantaneous response over 8--128, shown as response percentiles, and observed composition change from 8 to 128. Both retain all 121,767 locations without spatial smoothing. Predictions start from fixed $e_8$. Scale bars: 1\,mm. Definitions and color normalization are given in Appendix~\ref{app:response-meaning}.}
+\label{fig:ode-context}
+\end{figure}

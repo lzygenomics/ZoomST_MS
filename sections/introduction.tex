@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+Tissue function depends not only on local cellular composition, but also on how cells and their neighborhoods are organized within larger anatomical structures~\citep{schurch2020coordinated}. Spatial transcriptomics measures molecular profiles together with spatial position, making it possible to study these levels of tissue organization within the same specimen~\citep{chen2022mosta,pan2026hesta}. Importantly, tissue characteristics depend on the spatial scale at which they are considered: local neighborhoods capture cellular composition and interactions, whereas broader spatial contexts reveal regional organization and anatomical structure. Relating these scales is therefore essential for understanding how local molecular environments are embedded within larger tissue organization.
+
+Spatial representation methods typically characterize tissue context within a predefined neighborhood or spatial graph~\citep{long2023graphst,singhal2024banksy}. Multiscale methods extend this view by learning representations at several spatial scales or combining information across them~\citep{yuan2024mender,zhao2025stofm,lin2024stalign}. However, these approaches largely provide representations at a discrete set of predefined scales and treat them as parallel sources of information to be combined. Tissue organization can change systematically with scale. \textbf{Local structures may persist as broader spatial context introduces new regional characteristics and reorganizes their spatial relationships.} Capturing such scale-dependent organization therefore requires modeling not only representations at individual scales, but also how they transform across scales.
+
+Existing pretraining objectives provide limited supervision for learning these transformations. Single-cell pretraining commonly predicts masked genes or expression values from molecular context within a cell~\citep{theodoris2023geneformer,cui2024scgpt}, while spatial predictive objectives incorporate neighboring cells to recover molecular information or latent cell states~\citep{zhao2025stofm,liu2026cellworld}. These objectives primarily learn what can be inferred within a given context, rather than how representations vary with spatial scale. Organizing scale-specific representations within a shared latent space makes their common and scale-dependent characteristics directly comparable, while modeling transformations between them extends representation learning beyond a few predefined scales toward continuously varying spatial contexts. This enables a more fine-grained characterization of how tissue context changes with spatial scale.
+
+We introduce \method{}, a self-supervised framework that jointly learns granularity-specific tissue representations and transformations between them. Within each granularity, reconstruction and molecular--spatial dual-view alignment ground the representations in molecular content and spatial context. A shared neural ODE transforms molecular states along a continuous log-granularity axis; source and target granularities specify the integration interval. Inspired by learned equivariance~\citep{lenc2015equivariance}, we encourage statistical agreement between the two routes through a \emph{soft distributional equivariance} constraint. We pair each fine representation with either its predicted or its directly encoded coarse counterpart and compare the resulting joint distributions. This constrains fine--coarse associations, not just the distribution of coarse predictions.
+
+We evaluate both the representations and their transformations in developmental spatial transcriptomic atlases. Our main contributions are:
+
+\begin{itemize}
+\item \textbf{Learning cross-granularity transformations during pretraining.}
+We formulate changes in observation granularity as a prediction task and jointly learn the tissue representations and transformations that connect them. Nested observations provide cross-granularity supervision through soft distributional equivariance, alongside molecular--spatial learning within each granularity.
+
+\item \textbf{Generalization to held-out tissue sections.}
+Frozen representations support tissue mapping and preserve developmental ordering within Brain on held-out mouse sections spanning all sampled developmental stages. For tissue mapping, they outperform the evaluated pretrained baselines and remain competitive with target-fitted methods. Learned transformations also predict directly encoded coarse representations on these sections. Anatomical analysis illustrates complementary uses of fine and coarse context.
+
+\item \textbf{Prediction at unseen intermediate granularities.}
+We jointly train the encoder and continuous transformation using only discrete granularities. With both frozen on held-out sections, the transformation predicts directly encoded representations at unseen intermediate ranges. These predictions also capture relative differences in context sensitivity across tissue locations.
+
+\end{itemize}

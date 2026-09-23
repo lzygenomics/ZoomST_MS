@@ -1,0 +1,14 @@
+\section{Evaluation design}
+\label{sec:experiments}
+
+\paragraph{Pretraining and evaluation.}
+We pretrained ZoomST on 45 MOSTA mouse embryo sections~\citep{chen2022mosta} and reserved eight sections in advance for evaluation, one from each developmental stage from E9.5 to E16.5. Zero-shot representation evaluations use frozen encoders. The No Cross ablation omits cross-granularity supervision while matching the full model's total number of training updates. ZoomST is supervised only at granularities 8, 32 and 128. We assess anatomical organization and developmental ordering in the retained representations, and evaluate learned transformations at both trained and unseen target granularities. Data splits, preprocessing, and optimization settings are provided in Appendices~\ref{app:preprocessing}--\ref{app:hyperparameters}.
+
+\paragraph{Retained tissue information.}
+Whole-section clustering compares frozen ZoomST, Novae and SToFM with target-fitted GraphST, BANKSY, MENDER and STAGATE, sharing positions, annotation-defined cluster counts and readout settings. AMI and physical 32-neighbor retention evaluate anatomical and spatial correspondence. Anatomical cases use class IoU. Within Brain, pseudotime--stage correlations evaluate developmental ordering (Appendix~\ref{app:developmental-ordering}). Separately, matched continuations on three sections compare Base, Base+CS and Base+CS+JointMMD; native neighbor overlap and same-location Recall@32 evaluate retained molecular states on the corresponding adapted sections (Appendices~\ref{app:dual-view}, \ref{app:objective-ablation}).
+
+\paragraph{Predictive relationships.}
+Direct neighborhood encodings provide reference targets. Trained endpoints use all held-out positions, with shuffled-pair controls. Intermediate tests use 1,024 fixed positions per section at unseen granularities 12, 16, 24, 48, 64 and 96 to evaluate state prediction and relative context sensitivity. Intermediate encodings are used only for evaluation (Appendices~\ref{app:granularity-transfer}, \ref{app:scale-continuum}).
+
+\paragraph{Spatial and physical interpretation.}
+Response analyses compare predicted changes with directly encoded changes and annotated neighborhood composition. Facial nerve and Brain illustrate composition change and variation within a broad annotation, respectively. Physical extents use the exact nested supports and nominal bin50 calibration. Appendix~\ref{app:scale-continuum} specifies location sampling and response readouts.

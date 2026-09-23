@@ -1,0 +1,82 @@
+\section{Data and preprocessing}
+\label{app:preprocessing}
+
+\paragraph{Data split.}
+MOSTA supplies 53 mouse embryo sections. We reserved one section from each developmental stage from E9.5 to E16.5 in advance for evaluation and used the remaining 45 sections for pretraining. Training spans the same eight stages. Table~\ref{tab:heldout-inventory} lists the held-out sections; Table~\ref{tab:evaluation_protocol} summarizes data use and aggregation for each analysis.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Held-out section inventory.} Every listed section is excluded from both pretraining stages.}
+\label{tab:heldout-inventory}
+\begin{tabular}{ll}
+\toprule
+Stage & Held-out section \\
+\midrule
+E9.5 & E9.5 E2S4 \\
+E10.5 & E10.5 E2S1 \\
+E11.5 & E11.5 E1S4 \\
+E12.5 & E12.5 E2S1 \\
+E13.5 & E13.5 E1S4 \\
+E14.5 & E14.5 E2S2 \\
+E15.5 & E15.5 E2S1 \\
+E16.5 & E16.5 E2S13 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Input preprocessing.}
+The inputs use the original \texttt{count} layer and a 30,235-entry gene vocabulary. Existing center tokens are inherited from the prepared source data. Neighborhood profiles average normalized expression over the full gene space before selecting up to 512 tokens and assigning 31 nonzero expression bins, with bin zero reserved for padding. The inherited preprocessing uses library normalization to $10^4$, $\log(1+x)$, and section-specific nonzero gene medians; genes with fewer than ten nonzero observations use a fallback median. Target sections supply their own gene statistics and use the inherited vocabulary. Whole-section readout standardization, PCA, and clustering are fitted on target-section positions; method-specific settings are given in Appendix~\ref{app:dual-view}.
+
+Relative coordinates are centered at the focal position and scaled by the maximum distance within its 128-neighbor window, then sliced to smaller supports. Granularity counts observations; its physical extent depends on the sampled tissue. Maps preserve the measured lattice and leave missing positions empty, without label interpolation.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Data split and evaluation protocol.} These conditions apply to the corresponding evaluations throughout the paper.}
+\label{tab:evaluation_protocol}
+\begin{tabularx}{\linewidth}{@{}p{0.20\linewidth}X@{}}
+\toprule
+Evaluation & Data use and aggregation \\
+\midrule
+Held-out sections & The eight sections in Table~\ref{tab:heldout-inventory} evaluate pretrained encoders with frozen weights. Input preprocessing and target-fitted readouts are specified above and in Appendix~\ref{app:dual-view}. \\
+Anatomical analyses & E14.5 E1S1 (granularity and Facial nerve analyses) and E16.5 E1S1 (state and context-response analyses) belong to the training set. The E12.5 E2S1 whole-section map and E16.5 E2S13 Brain mapping display use held-out sections. \\
+Developmental ordering & Stage-balanced Brain observations from the held-out sections evaluate pseudotime--stage agreement. Sampling, shared baseline fits, and both correlation readouts are specified in Appendix~\ref{app:developmental-ordering}. \\
+Response summaries & Direct-encoding analyses use eight training E1S1 sections and eight holdouts. Section--domain--range summaries combine both groups; the high--low response comparison reports the eight holdouts separately. \\
+Matched continuation & E12.5 E2S1, E14.5 E1S1, and E16.5 E1S1 are adapted separately and evaluated on the respective adapted section, using one training seed. E12.5 was excluded from base pretraining; the other two sections were included. \\
+Aggregation & Section summaries receive equal weight. Position-level distributions describe within-section variation; queries, projections, shuffles and batches specify sampling and numerical averaging. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{External pretrained models.}
+Novae uses the public mouse-0 weights, and SToFM uses its public checkpoint with the specified mouse-to-human gene mapping. The sections held out from ZoomST training appear in the SToCorpus-88M inventory, so SToFM may have been exposed to our zero-shot evaluation data.
+
+\input{sections/appendix_methods}
+
+\section{Tissue representation evaluation}
+\label{app:scale-cases}
+
+\subsection{Anatomical granularity cases}
+
+The anatomical granularity analysis uses E14.5 E1S1 and the frozen MOSTA model defined in Section~\ref{sec:experiments}. Its 102,519 measured positions supply neighborhood context; scoring uses the fixed union of Heart (2,952), Lung (2,011), Liver (6,015), GI tract (1,260), Smooth muscle (1,737), and Pancreas (425). Each output is standardized and projected by full-SVD PCA 32 on these 14,400 positions. MiniBatchKMeans uses six clusters, batch size 2,048, three initializations, at most 200 iterations, no-improvement limit 30, and seed 42. Atlas annotations define the domain, cluster count, post-hoc maximum-overlap one-to-one assignment, and scores. They do not fit the feature transform or clustering.
+
+Scores are computed over all positions in the fixed evaluation domain. The maps preserve measured coordinates without smoothing or interpolation. Coarse and fine maps share viewing limits and the same readout settings.
+
+For class $c$, predicted and annotated position sets $P_c,T_c$ within the fixed scoring domain define
+\begin{equation}
+\mathrm{IoU}_c=\frac{|P_c\cap T_c|}{|P_c\cup T_c|}
+=\frac{\mathrm{TP}_c}{\mathrm{TP}_c+\mathrm{FP}_c+\mathrm{FN}_c}.
+\label{eq:iou}
+\end{equation}
+TP counts correct assignments, FP extra assignments, and FN missed targets.
+
+Adjusted mutual information (AMI) measures the information shared by cluster and annotation assignments after subtracting chance mutual information and dividing by mean marginal entropy minus that same chance expectation. The adjusted Rand index (ARI) measures chance-corrected agreement in whether pairs of positions share a class. Both are invariant to cluster renaming.
+
+\input{sections/appendix_dual_view}
+
+\input{sections/appendix_granularity_transfer}
+
+\clearpage
+\input{sections/appendix_scale_continuum}
+
+\clearpage
+\input{sections/appendix_objective_ablation}

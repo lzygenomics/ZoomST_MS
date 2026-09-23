@@ -1,0 +1,8 @@
+\subsection{Fine--coarse relations transfer to held-out sections}
+\label{sec:granularity-transfer}
+
+Beyond retaining tissue information, ZoomST learns relationships between descriptions at different observation ranges. We test whether these relationships transfer to held-out sections by predicting broader-context molecular states from finer descriptions. At each location, one route directly encodes the broader neighborhood; the other uses only its finer molecular state and the requested target granularity. The directly encoded coarse state is the common reference for both the transformed state and the unchanged fine state.
+
+Across all eight held-out sections, the learned transformation reduces MSE to directly encoded coarse states relative to the unchanged fine representation (Figure~\ref{fig:granularity-transfer}A). Mean reductions are 21.3\%, 27.0\%, and 11.8\% for $8\to32$, $8\to128$, and $32\to128$, respectively.
+
+We further examine whether agreement with the coarse states depends on which fine and coarse descriptions are paired. Shuffling predicted coarse states across locations leaves the set of predictions unchanged but assigns them to different fine sources. We compare these pairs with the directly encoded fine--coarse pairs using joint-distribution discrepancy. Correct pairings have lower discrepancy than shuffled pairings in all sections and directions, including evaluation with projections unused in training (Figure~\ref{fig:granularity-transfer}B). Alongside the state-error reduction, this supports reuse of location-dependent fine--coarse associations. Section-level errors and pairing controls are given in Appendix~\ref{app:granularity-transfer}.

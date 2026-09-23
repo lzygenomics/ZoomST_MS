@@ -1,0 +1,13 @@
+\subsection{Different anatomical structures favor different observation granularities}
+\label{sec:anatomical-scale-preference}
+
+The whole-section evaluation combines information from several granularities. To examine why these descriptions should also remain separately available, we now hold the spatial branch fixed and change only its observation range. We compare $g_8$ and $g_{128}$ at the same locations, using matched anatomical readouts in a six-region visceral domain of E14.5 E1S1.
+
+Broader context recovers the Lung region more completely, reducing missed locations within this large structure; IoU increases from 0.894 to 0.955. The effect is reversed for Smooth muscle. Its narrow bands and rings are better separated from surrounding tissue with fine context; the coarse representation assigns more surrounding positions to Smooth muscle, lowering IoU from 0.779 to 0.580 (Figure~\ref{fig:results1-mosta}). Thus, expanding context changes which anatomical distinctions the representation supports. Retaining both descriptions lets an analysis emphasize broad regional identity or narrower compartments without retraining the encoder. Appendix~\ref{app:scale-cases} specifies the fixed domain and readout.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.90\linewidth]{figures/mosta_lung_smooth_muscle.pdf}
+\caption{\textbf{Broad Lung regions and narrow Smooth muscle favor different granularities.} Annotation, $g_8$, and $g_{128}$ predictions use identical positions and readouts in MOSTA E14.5 E1S1. Blue marks correct targets, orange extra inclusions, and magenta missed targets. IoU uses all 14,400 task positions and clustering seed 42.}
+\label{fig:results1-mosta}
+\end{figure}

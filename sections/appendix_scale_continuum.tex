@@ -1,0 +1,142 @@
+\section{Unseen granularities and context response}
+\label{app:scale-continuum}
+
+\subsection{Effect of transition parameterization}
+\label{app:transition-comparison}
+
+\paragraph{Shared-encoder comparison.}
+The neural ODE and granularity-conditioned residual MLP are trained at 8, 32 and 128 on a shared frozen encoder, then evaluated against the same directly encoded targets. Averaging MSE over six unseen granularities, the ODE reduces error on every held-out section, with a mean paired reduction of 10.86\% (Figure~\ref{fig:ode-transition-comparison}).
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/ode_vs_transition_boxplots.pdf}
+\caption{\textbf{Lower mean unseen-granularity error with neural ODE.} Each panel compares the granularity-conditioned residual MLP and ODE on one held-out section. Both heads use the same frozen encoder, fine-state inputs and directly encoded targets. Each box contains 1,024 location-level MSEs, each averaged equally over $k\in\{12,16,24,48,64,96\}$. Boxes show medians and interquartile ranges; whiskers extend to 1.5 interquartile ranges, with all outliers shown. Connected diamonds mark section means; percentages give their paired relative reductions. All panels share the same logarithmic axis.}
+\label{fig:ode-transition-comparison}
+\end{figure}
+
+We compare the ODE with the granularity-conditioned residual MLP,
+\[
+T^{\mathrm{MLP}}_{a\to b}(z)=z+\mathrm{MLP}\!\left([\mathrm{LN}(z),h(a),h(b),u(b)-u(a)]\right).
+\]
+The MLP has dimensions $321\to128\to256$ with GELU activation and 32-dimensional scale embeddings; the ODE field has dimensions $257\to128\to256$. For a query between adjacent trained coordinates $u_j,u_{j+1}$, the MLP uses $h(k)=(1-w)h_j+wh_{j+1}$ with $w=(u(k)-u_j)/(u_{j+1}-u_j)$. The heads contain 74,848 and 66,560 trainable parameters, respectively.
+
+Both heads are initialized afresh with seed 42 and trained on the same frozen encoder outputs from all 45 source sections for two epochs (7,224 updates; batch 1,024). AdamW uses learning rate $2\times10^{-4}$, 188 warmup steps and cosine decay to one tenth of the peak rate; gradient norms are clipped at five. Weight decay is 0.02 for weight matrices, 0.01 for scale embeddings and zero for normalization and bias terms. Both use the same coarse-support and JointMMD supervision, together with the composition penalty $\|T_{32\to128}(T_{8\to32}(z))-T_{8\to128}(z)\|_2^2/d$ averaged over fine states in each 128-support. All three weights warm up to one. The ODE uses RK4 with maximum step 0.25 in $u$. Evaluation uses the same 1,024 positions per held-out section and the same directly encoded targets for both heads.
+
+For section $s$, let $M_s^m$ be its MSE averaged equally over the six unseen targets for head $m$. The mean paired reduction is $100\,\mathrm{mean}_s(1-M_s^{\mathrm{ODE}}/M_s^{\mathrm{MLP}})=10.86\%$, ranging from 7.28\% to 14.56\% across sections. Table~\ref{tab:ode-transition-frozen} gives the section summaries underlying Figure~\ref{fig:ode-transition-comparison}. These are separately fitted transition heads on a common reference encoder; the following joint-training comparison evaluates complete models.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Matched transition heads on a shared frozen encoder.} MSE is averaged over all six unseen targets and 1,024 locations per section. The mean reduction averages the eight paired section reductions.}
+\label{tab:ode-transition-frozen}
+\input{tables/ode_transition_frozen_comparison}
+\end{table}
+
+\paragraph{Joint-training comparison.}
+Both complete models start from the same pretrained backbone and use the same 45 training sections, seed 42, batch size 160 and 46,400 updates. Their relation supervision is the same as above, together with the base objective. At evaluation, each model predicts its own encoder's directly encoded targets at the same held-out locations. Table~\ref{tab:ode-transition-joint} reports error normalized within each model's representation space. The ODE has lower mean NRMSE on each of the eight held-out sections. Its mean MSE reduction relative to unchanged $e_8$ is 21.96\%, compared with 17.53\% for the MLP. The trained ODE model is used for the remaining analyses.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Unseen-granularity prediction after matched joint training.} Each section uses 1,024 fixed locations and all six unseen targets. Mean NRMSE averages target-specific NRMSEs, each normalized by target variation within the section. MSE reduction compares the mean prediction and unchanged-$e_8$ errors across the six targets, against each model's own encoded states. The final row gives equal-section means.}
+\label{tab:ode-transition-joint}
+\input{tables/ode_transition_joint_summary}
+\end{table}
+\FloatBarrier
+
+\subsection{Agreement with unseen neighborhood encodings}
+\label{app:unseen-state-detail}
+
+\paragraph{Frozen state prediction.}
+The MOSTA encoder and ODE transition are frozen after joint training at 8,32,128. We use 1,024 fixed positions on each of the eight held-out sections and directly encode neighborhoods at $\mathcal K=\{8,12,16,24,32,48,64,96,128\}$. The molecular encoding procedure and neighborhood ordering remain unchanged. All predictions start from the same $e_{i,8}$; the encoded intermediate states are scoring references and do not enter these predictions.
+
+Let $\widehat e_i(k)=T_{8\to k}(e_{i,8})$ and $\mathcal U=\mathcal K\setminus\{8,32,128\}$. For section $s$, target MSE averages $d^{-1}\|\widehat e_i(k)-e_i(k)\|^2$ over positions. The section's relative gain is one minus its MSE averaged over $k\in\mathcal U$ divided by the corresponding unchanged-$e_8$ MSE. Gains are then averaged over eight sections, yielding 21.96\%. Normalized RMSE divides RMSE by the target's root-mean-square variation around its section mean, so $R^2=1-\mathrm{NRMSE}^2$ within each section. Table~\ref{tab:ode-intermediate-sections} reports all 48 section--granularity error ratios.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Unseen-scale target-MSE ratios.} Every entry compares $T_{8\to k}(e_8)$ with unchanged $e_8$ against directly encoded $e_k$ on the same 1,024 locations. Values below one improve prediction.}
+\label{tab:ode-intermediate-sections}
+\input{tables/ode_intermediate_sections}
+\end{table}
+
+\paragraph{Distance to a common directly encoded target.}
+For the direct-distance comparison in Figure~\ref{fig:ode-unseen-distance-distributions}, define
+\[
+d_i^{\mathrm{start}}(k)=\frac{\|e_{i,8}-e_i(k)\|_2}{\sqrt d},\qquad
+d_i^{\mathrm{pred}}(k)=\frac{\|\widehat e_i(k)-e_i(k)\|_2}{\sqrt d}.
+\]
+At each target, we average these per-position RMS distances within each section. Sections receive equal weight in the summary. Averaging $1-\overline d_s^{\mathrm{pred}}(k)/\overline d_s^{\mathrm{start}}(k)$ equally over the six unseen targets and eight sections gives a 10.38\% reduction, ranging from 3.04\% to 20.55\% across the 48 conditions. Every condition has a lower mean and median prediction distance. Within individual conditions, 81.15--99.71\% of positions are closer to the target. This RMS-distance statistic differs from the reduction in mean squared error reported above.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/unseen_state_distances_all_sections.pdf}
+\caption{\textbf{Within-section distributions of distance to directly encoded unseen states.} The panels cover eight held-out sections and six unseen target granularities. Each pair compares distances from unchanged $e_8$ and from the prediction to the same target at the same 1,024 fixed positions. Boxes show medians and interquartile ranges, whiskers extend to 1.5 interquartile ranges, and outliers are retained. Position distributions describe each section; section means are the units in the main comparison.}
+\label{fig:ode-unseen-distance-distributions}
+\end{figure}
+
+\paragraph{Shared-space visualization and full-state error.}
+The E16.5 E1S1 analysis uses 1,024 fixed positions. We fit a center-only, full-SVD PCA on the directly encoded states at all nine granularities, then apply the same mean and components to predictions. All positions are shown with common axis limits. The first two PCs explain 20.25\% and 17.02\% of encoded-state variance. Table~\ref{tab:ode-case-pca} reports prediction accuracy in the full 256-dimensional space.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/case_all_unseen_pca_no_pair_lines.pdf}
+\caption{\textbf{All six unseen target states in the E16.5 E1S1 case.} Every panel uses the same PCA basis and the same 1,024 positions. Metrics are computed in 256 dimensions. Targets and predictions are paired at each location.}
+\label{fig:ode-case-all-pca}
+\end{figure}
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Full-dimensional accuracy underlying the case PCA.} MSE ratio compares prediction with unchanged $e_8$ against directly encoded targets; NRMSE and $R^2$ use the same full-dimensional targets.}
+\label{tab:ode-case-pca}
+\input{tables/ode_case_pca_metrics}
+\end{table}
+
+\FloatBarrier
+\subsection{Context-response evaluation across observation ranges}
+\label{app:response-meaning}
+
+\paragraph{Matched response definitions and sampling.}
+For $\widehat e_i(k)=T_{8\to k}(e_{i,8})$, Figures~\ref{fig:scale-continuum}C and~\ref{fig:ode-context}A,B use
+\[
+D_i^{\mathrm{pred}}(a,b)=
+\frac{\|\widehat e_i(b)-\widehat e_i(a)\|_2}{\sqrt d\,\log_2(b/a)},\qquad
+D_i^{\mathrm{enc}}(a,b)=
+\frac{\|e_i(b)-e_i(a)\|_2}{\sqrt d\,\log_2(b/a)}.
+\]
+Both operands in the predicted displacement belong to queries from the same fixed $e_8$. Encoded states are evaluation references, and all displayed doubling intervals have log width one.
+
+We evaluated eight encoder-training E1S1 sections and eight held-out sections, spanning the eight sampled stages. Domain-level analyses use up to 128 locations per section and annotation, selected by a fixed hash of observation identity, retaining every location in smaller domains. This yields 37,865 locations over 300 section--domain combinations. Section-level comparisons use 1,024 fixed locations per section. Section assignments and aggregation are summarized in Table~\ref{tab:evaluation_protocol}.
+
+\paragraph{Held-out location ordering.}
+For each held-out section and each doubling range, we sort the original 1,024 locations by predicted finite response and split them into four equal groups; ties preserve sample order. We then compare their directly encoded responses. Table~\ref{tab:ode-response-heldout} reports the highest-to-lowest group-mean ratios for all 32 conditions. The highest-response quarter has a larger mean directly encoded change than the lowest-response quarter in 31 of 32 held-out section--range conditions. Equal-section mean ratios are 1.673, 1.545, 1.497 and 1.440 across the four ranges.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Encoded changes in high- versus low-predicted-response locations.} Each value is the ratio of directly encoded group means, with 256 locations in each group. All eight held-out sections and four doubling ranges are shown.}
+\label{tab:ode-response-heldout}
+\input{tables/ode_response_heldout_v5}
+\end{table}
+
+\paragraph{Tissue and range dependence.}
+Table~\ref{tab:ode-response-cases} reports all four doubling ranges for the Facial nerve and Brain examples. Facial nerve agreement is strongest at $64\to128$ and weak at $16\to32$; Brain agreement decreases across the four ranges. Across all 1,200 section--domain--range combinations from the eight training and eight held-out sections, 1,039 have positive predicted--encoded correlations.
+
+\begin{table}[!htbp]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{\textbf{Response examples across every doubling range.} $P$, $E$ and $C$ denote predicted response, encoded response and composition TV. P/E is the ratio of mean predicted to encoded response magnitudes. Sample sizes are 64 (Facial nerve) and 128 (Brain), fixed across ranges.}
+\label{tab:ode-response-cases}
+\input{tables/ode_response_cases_v5}
+\end{table}
+
+\paragraph{Response magnitudes.}
+The median ratio of mean predicted to encoded response is 0.384 (interquartile range 0.352--0.422), showing systematic underestimation of response magnitude.
+
+\paragraph{Actual neighborhood composition.}
+Let $q_{ic}(k)$ be the proportion of annotation $c$ among the $k-1$ neighbors after excluding the focal center. For the same interval as the response,
+\[
+C_i(a,b)=\tfrac12\sum_c|q_{ic}(b)-q_{ic}(a)|.
+\]
+Support ordering is identical to the model input, and unknown-label mass is retained. The Facial nerve composition bars follow the same 16 locations in each extreme predicted-response quarter. Their mean encoded changes are 0.0191 and 0.0343 in the low and high groups, respectively (ratio 1.799). Corresponding mean TV values are 0.134 and 0.284. Composition TV quantifies the change in annotated tissue proportions.
+
+\paragraph{Within-Brain changes under a constant annotation.}
+At $8\to16$, 14,180 of the 17,374 Brain positions have only Brain-labeled neighbors in both supports. Among the fixed 128 sampled locations, 95 have only Brain-labeled neighbors at both granularities. For these 95 positions, the 10th and 90th percentiles of encoded response are 0.0150 and 0.0268 despite zero annotation TV; predicted--encoded Spearman correlation is 0.645. Across all 128 positions it is 0.600, while encoded response and annotation TV have correlation 0.009. These results show that context response captures molecular-context variation beyond changes in broad annotation proportions.
+
+\paragraph{Whole-section spatial overview.}
+Figure~\ref{fig:ode-context}C averages the instantaneous response $s_i(2^t)=\|f_\theta(z_i((t-3)/4),(t-3)/4)\|_2/(4\sqrt d)$ over 64 equally spaced midpoints in $t=\log_2 k\in[3,7]$. This path-averaged speed differs from the finite displacement used in panels A,B. Colors use an empirical percentile reference pooled over the full-range mean and the four doubling-range means, with all 121,767 locations included. Panel D shows observed composition TV from 8 to 128. The maps show spatial distributions without smoothing; their whole-section Spearman correlation is 0.174. Spatial scale bars use the nominal $25\,\mu$m pitch of the bin50 matrices~\citep{chen2022mosta}; response remains normalized by $\log_2 k$.

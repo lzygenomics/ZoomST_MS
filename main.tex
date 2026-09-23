@@ -1,0 +1,71 @@
+\documentclass{article}
+
+\usepackage{iclr2027_conference}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage{times}
+\else
+  \usepackage{fontspec}
+  \setmainfont{STIX Two Text}
+  \setsansfont{Liberation Sans}[Scale=MatchLowercase]
+  \setmonofont{Liberation Mono}[Scale=MatchLowercase]
+\fi
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,multirow,array,tabularx}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,calc,fit,positioning,shapes.geometric}
+\usepackage{hyperref}
+\usepackage{url}
+\hypersetup{hidelinks}
+
+\definecolor{flowblue}{HTML}{2F65A7}
+\definecolor{flowteal}{HTML}{2A9D8F}
+\definecolor{floworange}{HTML}{E07A35}
+\definecolor{flowred}{HTML}{B42318}
+\definecolor{flowgray}{HTML}{667085}
+\definecolor{flowlight}{HTML}{F2F4F7}
+
+\newcommand{\method}{ZoomST}
+\newcommand{\asnll}{\textsf{All-Source NLL}}
+\newcommand{\Rset}{\mathcal{R}}
+\newcommand{\Pset}{\mathcal{P}}
+\newcommand{\support}{\mathcal{S}}
+\newcommand{\stopgrad}{\operatorname{sg}}
+\newcommand{\diag}{\operatorname{diag}}
+
+\title{ZoomST: Pretraining Spatial Transcriptomic\\Representations with Learnable\\Cross-Granularity Transformations}
+
+\author{Anonymous authors}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/problem_and_backbone}
+\input{sections/coarse_support_consistency}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/discussion}
+\clearpage
+\input{sections/statements}
+
+\bibliography{references}
+\bibliographystyle{iclr2027_conference}
+
+\clearpage
+\appendix
+\input{sections/appendix}
+
+\end{document}

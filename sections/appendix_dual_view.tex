@@ -1,0 +1,94 @@
+\subsection{Whole-section tissue mapping and neighbor retention}
+\label{app:dual-view}
+
+The tissue-mapping evaluation uses frozen MOSTA representations on the held-out sections listed in Appendix~\ref{app:preprocessing}.
+
+The No Cross ablation omits cross-granularity supervision and uses the same total number of training updates as the full model. Both models use the same joint readout and are frozen during evaluation. Optimization and update budgets are specified in Appendix~\ref{app:hyperparameters}.
+
+The displayed names ZoomST e, ZoomST g, and ZoomST joint refer to three readouts of the same frozen model. Molecular features concatenate the three 256-dimensional outputs $e_8,e_{32},e_{128}$; spatial features concatenate $g_8,g_{32},g_{128}$. Joint features concatenate all six outputs. Novae uses its public mouse-0 checkpoint; SToFM uses its public checkpoint with the declared mouse-to-human gene mapping. Each ZoomST or public pretrained candidate is independently standardized and projected to 32 dimensions using randomized PCA with seed 42, 32 oversamples, five power iterations, and no whitening. Standardization and PCA fit all target-section positions without annotation values. MiniBatchKMeans uses $K$ clusters, where $K$ is the number of classes in the section's primary \texttt{annotation} field, with k-means++ initialization, ten initializations, batch size 4,096, at most 300 iterations, a ten-step no-improvement limit, and seeds 42, 43, and 44.
+
+Scores are computed over all positions in each evaluated section. Adjusted mutual information (AMI) and adjusted Rand index (ARI) measure chance-adjusted agreement between the cluster partition and the atlas annotation. One-to-one maximum-overlap Hungarian matching assigns anatomical labels to clusters for the maps and class-specific IoU. For class $c$, $\operatorname{IoU}_c=\operatorname{TP}_c/(\operatorname{TP}_c+\operatorname{FP}_c+\operatorname{FN}_c)$. AMI and ARI are invariant to the matching. Section-level scores are averaged with equal section weights.
+
+\paragraph{Target-fitted spatial methods.}
+GraphST, BANKSY, MENDER, and STAGATE~\citep{long2023graphst,singhal2024banksy,yuan2024mender,dong2022stagate} use each complete target section independently, with expression and coordinates but no anatomical training labels. The model or feature-construction seed is 42; each fixed representation is then clustered with seeds 42, 43, and 44. Tables group these target-fitted methods separately from frozen pretrained representations.
+
+GraphST and STAGATE select 3,000 highly variable genes by Seurat-v3 on raw counts, followed by counts-per-10,000 normalization and log1p. GraphST additionally applies noncentered gene scaling clipped at 10. GraphST uses its Stereo-seq three-neighbor graph and a sparse implementation of the native objective, with 600 epochs, learning rate 0.001, and hidden dimension 64. The readout uses its normalized reconstructed-gene output. STAGATE uses the official PyG model, a symmetrized six-neighbor graph with self loops, hidden dimensions 512 and 30, 1,000 epochs, learning rate 0.001, weight decay 0.0001, and gradient clipping at 5. It uses the full section graph without an annotation-derived auxiliary graph.
+
+BANKSY and MENDER normalize all genes to counts per 10,000, apply log1p, and select 3,000 genes by Seurat dispersion. BANKSY uses neighborhood statistics with 15 and 30 neighbors for orders zero and one and scaled-Gaussian decay. The fixed primary weight is $\lambda=0.8$, the official default for tissue-domain segmentation~\citep{singhal2024banksy}; the documentation explicitly includes Stereo-seq among the technologies for which this setting is recommended.\footnote{\url{https://prabhakarlab.github.io/Banksy/}, accessed 15 September 2026.} BANKSY's native channel normalization and weighting are preserved, without a second StandardScaler before PCA32. MENDER derives 32 unsupervised expression states using StandardScaler, PCA32, and MiniBatchKMeans with ten initializations; it then aggregates these states over six rings with ring parameter four, including the center, producing 192 features. MENDER's state labels are independent of the anatomical annotation.
+
+The shared randomized-PCA and clustering settings above apply to these features. STAGATE retains its native 30 dimensions; the other methods use PCA32. The comparison shares positions, labels, and downstream algorithms while retaining these method-specific feature definitions. One neural training seed is evaluated per section.
+
+\paragraph{Whole-section anatomical results.}
+Table~\ref{tab:representation-summary} reports AMI for all eight sections, and Table~\ref{tab:representation-secondary-ari} reports ARI from the same three clustering runs. Entries are the mean and sample standard deviation (denominator $3-1$) across clustering seeds. For the summary row, the eight sections are averaged equally within each seed before computing the mean and standard deviation. These standard deviations quantify clustering variability with fixed representations and sections. Joint ZoomST features have the highest mean ARI (0.345).
+
+\begin{table}[t]
+\centering\small
+\caption{\textbf{ARI on all eight held-out sections.} Models, positions, class sets, and clustering seeds match Table~\ref{tab:representation-summary}. Values are mean $\pm$ sample SD across three seeds; the last row first averages sections equally within each seed. Bold marks the top three unrounded values per row, including third-place ties.}
+\label{tab:representation-secondary-ari}
+\setlength{\tabcolsep}{0.8pt}
+\renewcommand{\arraystretch}{1.05}
+\input{tables/representation_secondary_metrics_ari}
+\end{table}
+
+\paragraph{Neighbor retention.}
+Neighbor retention compares neighborhood membership in physical and representation spaces, describing local geometric correspondence alongside anatomical agreement.
+Let $N_k^p(i)$ and $N_k^z(i)$ denote the $k$ nearest neighbors of query $i$ in physical coordinates and the corresponding PCA representation space, respectively. We report
+\begin{equation}
+R_k=\frac{1}{|Q|}\sum_{i\in Q}\frac{|N_k^p(i)\cap N_k^z(i)|}{k}.
+\end{equation}
+Each section supplies 2,048 queries equally spaced in original row order, with every original position as a candidate and the query excluded. Exact squared-Euclidean search breaks distance ties by source index. Integer-grid coordinates preserve raw spatial distances up to isometry where available; E15.5 retains the original spatial coordinates. Table~\ref{tab:representation-summary} and Figure~\ref{fig:dual-view-retention} use $k=32$ and the same concatenated, standardized PCA features as the anatomical readout for each ZoomST view, including joint features. Colored lines connect the same section across feature sets, and all eight sections are displayed.
+
+\paragraph{Whole-section maps.}
+Both views contain molecular information: $e$ encodes aggregated expression over a spatial support, while $g$ also uses relative arrangement. Joint features exceed the molecular view on seven of eight section-level AMIs; their benefit over the spatial view varies by section (Table~\ref{tab:dual-view-sections}).
+
+The E12.5 E2S1 display uses all 23,640 positions and the same 18-class \texttt{annotation} field and randomized-PCA readout as Table~\ref{tab:dual-view-sections}. Fixed seed 42 predictions are shown with one-to-one matched anatomical colors. Integer-grid coordinates are related to the raw coordinates by a distance-preserving rotation/reflection. Joint-feature IoUs for Brain and Choroid plexus are 0.402 and 0.228, respectively.
+
+The E16.5 E2S13 Brain display uses all positions in the section, without smoothing or interpolation. Molecular features produce 504 extra and 74 missed Brain assignments; spatial features produce 60 extra and 373 missed assignments; joint features produce 77 extra and 97 missed assignments. These maps use the seed-42 run included in the three-seed quantitative evaluation.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{figures/e125_full_section.pdf}
+\caption{\textbf{Whole-section tissue mapping in E12.5 E2S1.} The annotation and seven-method predictions share all 23,640 positions and 18 primary classes. Maximum-overlap one-to-one matching assigns anatomical colors. The top row contains annotation and frozen pretrained features; the lower row contains target-fitted methods. Maps use seed 42, with no smoothing or label interpolation.}
+\label{fig:dual-view-e125}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{figures/spatial_retention_multiview.pdf}
+\caption{\textbf{Local neighbor retention in the tissue-mapping representations.} Markers show physical 32-neighbor recovery over 2,048 fixed queries per section; all positions are candidates and self is excluded. Colored lines connect the same section within each method group, and black diamonds mark equal-section means. ZoomST $g$ and $e$ each concatenate granularities 8, 32, and 128; joint concatenates both views. All three use the same standardized PCA features as Table~\ref{tab:representation-summary}. Frozen pretrained representations and target-fitted spatial methods are grouped separately.}
+\label{fig:dual-view-retention}
+\end{figure}
+
+\FloatBarrier
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/brain_complementarity.pdf}
+\caption{\textbf{Complementary molecular and spatial errors in E16.5 Brain.} Columns show annotation, molecular, spatial, and joint features. Blue: correct assignments; orange: extra assignments; magenta: missed Brain. All maps and counts use seed 42 and the same whole-section readout. Each feature set combines its respective granularities.}
+\label{fig:dual-view-brain}
+\end{figure}
+
+\subsection{Developmental ordering within Brain}
+\label{app:developmental-ordering}
+
+Brain is selected by coverage across all eight stages and the minimum available stage count. The evaluation uses the same 589 Brain observations from each held-out section, for 4,712 observations in total. ZoomST joint and ZoomST no cross use the frozen models and concatenated features defined in Appendix~\ref{app:dual-view}; Novae and SToFM reuse their frozen embeddings.
+
+Table~\ref{tab:joint-scale-comparison} evaluates the joint representation separately at each context size $k\in\{8,32,128\}$. Anatomical agreement and physical-neighbor retention use the same whole-section protocol as Table~\ref{tab:representation-summary}, with the feature preprocessing fitted separately for each scale. DPT uses the same balanced Brain cohort, centered pooled PCA with 32 components, 30-neighbor graph, and fixed root for all six model--scale combinations. Each developmental stage is represented by one held-out section.
+
+\paragraph{Shared representations across sections.}
+For this cross-stage comparison, GraphST and STAGATE each fit one encoder jointly across all eight target sections with shared gene selection and separate within-section spatial graphs. BANKSY uses a common 3,000-gene panel, and MENDER uses a common codebook of 32 unsupervised expression states. These fits use the complete target sections before extracting the balanced Brain observations. Other feature-construction and model-training settings follow Appendix~\ref{app:dual-view}.
+
+\paragraph{Pseudotime.}
+The Novae, SToFM, GraphST, STAGATE, BANKSY, and MENDER embeddings undergo columnwise z-score standardization before pooled PCA. PCA is fitted on the pooled Brain observations with 32 components; STAGATE retains its native 30 dimensions. Euclidean nearest-neighbor graphs are constructed with RAPIDS single-cell, followed by diffusion mapping and diffusion pseudotime (DPT)~\citep{haghverdi2016dpt}. The GPU implementation uses Scanpy's default DPT distance definition with ten diffusion components.\footnote{\url{https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.dpt.html}} The neighborhood size is $k=30$. STAGATE and BANKSY use $k=50$ to connect their graphs; MENDER is also evaluated at $k=50$. The remaining DPT settings are shared. The root is the same E9.5 observation nearest the spatial centroid of the sampled E9.5 Brain domain. Sampling and numerical routines use random seed 42. Root distances are normalized by the largest finite distance within each method; all observations have finite pseudotime under the reported settings.
+
+\paragraph{Pseudotime--stage agreement.}
+For observation $i$, let $t_i$ denote pseudotime and $s_i$ its measured developmental stage. Spot-level Spearman correlation is $\operatorname{Spearman}(t_i,s_i)$ over all 4,712 observations. Stage-median Spearman correlation is $\operatorname{Spearman}(\operatorname{median}_{i:s_i=s}t_i,s)$ over the eight stages. Both use unrounded pseudotimes. Figure~\ref{fig:developmental-ordering} and Table~\ref{tab:developmental-ordering} report the two overall correlations.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Pseudotime--stage Spearman correlations within Brain.} Stage-median correlation uses the eight stage medians; spot-level correlation uses all 4,712 observations. Bold marks the highest value in each column.}
+\label{tab:developmental-ordering}
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.05}
+\input{tables/ode_developmental_ordering}
+\end{table}
+\FloatBarrier
