@@ -1,0 +1,26 @@
+\subsection{Cross-granularity learning enriches coarse developmental information}
+\label{sec:developmental-information}
+
+Anatomical identity does not exhaust the information needed to describe a developing tissue. We therefore test developmental ordering within Brain, using the same 589 observations per stage from the eight held-out sections. Diffusion pseudotime is compared with measured stage through stage-median and spot-level Spearman correlations, with a common root in E9.5 (Appendix~\ref{app:developmental-ordering}). Separating the three granularities first identifies where cross-granularity supervision contributes.
+
+At the coarsest granularity, $k=128$, the full model increases stage-median correlation from $-0.143$ to $0.381$ and spot-level correlation from $-0.239$ to $0.354$ relative to matched-update No Cross (Table~\ref{tab:joint-scale-comparison}). The gains are smaller at $k=32$ and are not uniform at $k=8$. Anatomical agreement remains comparable between models at each granularity. Both also retain the same broad trend: finer representations have higher anatomical agreement, whereas coarser representations retain more physical neighbors. Cross-granularity learning therefore enriches developmental-stage ordering in broad-context representations rather than merely changing their anatomical partition.
+
+\begin{table}[!htbp]
+\centering\scriptsize
+\caption{\textbf{Cross-granularity supervision enriches coarse developmental information.} Joint representations are evaluated separately at granularities 8, 32, and 128. AMI is mean $\pm$ sample SD across three clustering seeds after equally averaging eight sections. Neighbor retention is the equal-section recovery of physical 32-nearest neighbors. Both developmental correlations use the same 4,712 Brain observations. Bold marks the higher unrounded value between models at each granularity, including ties. Protocol: Appendix~\ref{app:developmental-ordering}.}
+\label{tab:joint-scale-comparison}
+\setlength{\tabcolsep}{2.2pt}
+\renewcommand{\arraystretch}{1.18}
+\input{tables/joint_scale_comparison}
+\end{table}
+\FloatBarrier
+
+This benefit also appears when all three granularities are combined in the joint readout (Figure~\ref{fig:developmental-ordering}). Stage-median and spot-level correlations increase from 0.619 and 0.651 for No Cross to 0.857 and 0.816 for ZoomST, the highest values among the evaluated methods. Together, the granularity-resolved ablation and the common multi-granularity readout show that relationship learning improves the developmental information available in coarse representations and in their combined description.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.90\linewidth]{figures/developmental_ordering_spearman.pdf}
+\caption{\textbf{Developmental ordering in the combined representation.} Stage-median and spot-level Spearman correlations between diffusion pseudotime and measured stage on the same 4,712 held-out Brain observations. ZoomST and No Cross concatenate joint features across the three training granularities. Pretrained encoders remain frozen. All methods share the stage-balanced cohort and earliest-stage root; baseline fitting and DPT settings are detailed in Appendix~\ref{app:developmental-ordering}.}
+\label{fig:developmental-ordering}
+\end{figure}
+\FloatBarrier

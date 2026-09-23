@@ -21,3 +21,14 @@ For the same queries, rank every native coarse state $e_{j,b}$ by its Euclidean 
 \mathbf1[r_i^{a\to b}\leq32].
 \]
 Exact ties again use original row index. The readout uses the retained molecular states directly, with no fitted alignment or transformation in the query. It assesses position identity without anatomical labels. Candidate counts differ between sections, so objective increments are compared within each section.
+
+\paragraph{Section-level scores and incremental summary.}
+Table~\ref{tab:objective-increments} gives all nine matched section--pair comparisons. The compact main-text Table~\ref{tab:objective-correspondence-summary} reports the minimum and maximum within-section gains for each pair, separately for CS versus Base and CS+MMD versus CS. These ranges summarize the reported scores; they are not confidence intervals or averages over candidate galleries.
+
+\begin{table}[!htbp]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\caption{\textbf{Retained-state correspondence under matched continuation.} Values are percentages. All settings use the same initialization, section, batch size and update budget. CS adds coarse-support supervision; CS+MMD is the complete cross-granularity objective. Bold marks the highest unrounded value per section, direction and readout, including ties.}
+\label{tab:objective-increments}
+\input{tables/objective_ablation_increments_EN}
+\end{table}

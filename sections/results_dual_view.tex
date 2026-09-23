@@ -1,17 +1,13 @@
-\subsection{Frozen representations retain anatomical and developmental information}
+\subsection{Frozen representations recover anatomy in held-out sections}
 \label{sec:dual-view-identification}
 
-We first test whether the retained representations distinguish anatomical compartments on new tissue sections. We cluster frozen features on the held-out MOSTA sections and compare the resulting partitions with atlas annotations. The molecular view $e$ summarizes neighborhood expression, whereas the spatial view $g$ also uses relative spatial arrangement. Here, each view combines its three training granularities; joint features combine both views. Comparing these feature sets asks whether the two views retain complementary information for tissue identification.
+Frozen ZoomST representations distinguish anatomical compartments on sections excluded from pretraining. We compare whole-section clustering with atlas annotations across all eight held-out MOSTA sections. Molecular features concatenate $e_8,e_{32},e_{128}$, spatial features concatenate $g_8,g_{32},g_{128}$, and joint features combine both views. All pretrained encoders remain frozen; the target-section readouts are specified in Appendix~\ref{app:dual-view}.
 
-The held-out E16.5 Brain case makes this complementarity visible. Molecular features recover most annotated Brain positions but also include neighboring non-Brain locations. Spatial features make fewer extra assignments but omit part of the Brain. Combining the views reduces this tradeoff: Brain IoU increases from 0.884 for $e$ and 0.905 for $g$ to 0.962 for joint features (Figure~\ref{fig:dual-view-brain}). The E12.5 whole-section maps provide a broader view of the tissue partitions recovered by the joint representation and the comparison methods (Figure~\ref{fig:dual-view-e125}).
+Joint ZoomST features achieve higher AMI than the evaluated public pretrained baselines on every held-out section, with an equal-section mean of 0.577, and remain competitive with target-fitted spatial methods (Table~\ref{tab:representation-summary}). The same features retain 52.7\% of physical 32-nearest neighbors on average, linking anatomical agreement to local spatial organization. The matched-update No Cross model has similar mean AMI (0.575), but lower neighbor retention (50.4\%). Thus, the full model retains anatomical discrimination while improving local spatial correspondence relative to this ablation.
 
-We also examine whether positions that are physically close remain neighbors in representation space. This tests local spatial correspondence alongside anatomical identity. Using the same features as for clustering, $g$ recovers more of each position's 32 physical neighbors than $e$ in seven of eight sections, with mean retention of 52.3\% versus 50.2\%. Joint features retain this spatial correspondence while combining the two views (Figure~\ref{fig:dual-view-retention}).
-
-Table~\ref{tab:representation-summary} brings these two readouts together in a comparison with other methods across all sampled developmental stages. Agreement between clusters and annotated domains, measured by AMI, is higher for joint ZoomST features than for the evaluated public pretrained baselines on every section. Mean AMI is 0.577, and performance remains competitive with methods fitted to each target section. The matched-update No Cross ablation has a similar mean AMI of 0.575, while neighbor retention increases from 0.504 for No Cross to 0.527 for the full model. The full representation thus combines similar anatomical discrimination with higher local spatial correspondence than No Cross.
-
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering\small
-\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI as mean $\pm$ sample SD over clustering seeds 42, 43, and 44. The summary averages sections equally within each seed. \textbf{(b)} Equal-section mean recovery of physical 32-nearest neighbors. Molecular and Spatial Views each concatenate three granularities; Joint combines both. No Cross omits cross-granularity supervision with the same joint readout and total training updates as the full model. Pretrained encoders are frozen. Bold marks the top three unrounded values per row, including third-place ties. Readouts and baselines: Appendix~\ref{app:dual-view}.}
+\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI as mean $\pm$ sample SD over clustering seeds 42, 43, and 44; the summary averages sections equally within each seed. \textbf{(b)} Equal-section mean recovery of physical 32-nearest neighbors. Molecular and Spatial Views each concatenate three granularities; Joint combines both. No Cross uses the same joint readout and total training updates without cross-granularity supervision. Pretrained encoders are frozen. Bold marks the top three unrounded values per row, including third-place ties. Protocol: Appendix~\ref{app:dual-view}.}
 \label{tab:representation-summary}
 \label{tab:dual-view-sections}
 \setlength{\tabcolsep}{0.8pt}
@@ -19,31 +15,12 @@ Table~\ref{tab:representation-summary} brings these two readouts together in a c
 \input{tables/representation_summary}
 \end{table}
 
-
-\begin{samepage}
-\paragraph{Frozen representations preserve developmental ordering.}
-Anatomical identity alone does not describe how a tissue changes during development. We computed diffusion pseudotime from stage-balanced Brain observations in the held-out E9.5--E16.5 sections to test whether frozen representations retain developmental ordering. ZoomST achieved stage-median and spot-level Spearman correlations of 0.857 and 0.816 with measured stage, compared with 0.619 and 0.651 for the matched-update No Cross ablation (Figure~\ref{fig:developmental-ordering}). The full model thus better preserves developmental ordering in unseen sections while retaining similar anatomical discrimination.
-\par
-\end{samepage}
+The held-out E16.5 E2S13 Brain case illustrates the complementary information in the two views (Figure~\ref{fig:dual-view-brain}). Molecular features recover most Brain positions but include neighboring tissue; spatial features make fewer extra assignments but miss part of the Brain. Joint features reduce this tradeoff, increasing Brain IoU from 0.884 for $e$ and 0.905 for $g$ to 0.962. Whole-section maps and section-wise spatial retention are provided in Figures~\ref{fig:dual-view-e125} and~\ref{fig:dual-view-retention}. These results establish a transferable representation base from which to assess the additional value of learning granularity relationships.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/developmental_ordering_spearman.pdf}
-\caption{\textbf{Developmental ordering within Brain across eight held-out sections.} Stage-median and spot-level Spearman correlations between diffusion pseudotime and measured developmental stage. All methods use the same stage-balanced Brain observations, with 589 locations per stage, and a common root in the earliest stage. ZoomST and No Cross use joint features concatenated across all three granularities. Pretrained encoders remain frozen; baseline fitting and DPT settings are detailed in Appendix~\ref{app:developmental-ordering}.}
-\label{fig:developmental-ordering}
+\includegraphics[width=\linewidth]{figures/brain_complementarity.pdf}
+\caption{\textbf{Complementary molecular and spatial errors on a held-out section.} Annotation, molecular, spatial, and joint Brain assignments in E16.5 E2S13. Blue: correct assignments; orange: extra assignments; magenta: missed Brain. All maps use the same whole-section readout and seed 42. Each feature set combines its respective training granularities.}
+\label{fig:dual-view-brain}
 \end{figure}
 \FloatBarrier
-
-\paragraph{Cross-granularity learning strengthens coarse-scale developmental information.}
-We next separate the three context sizes to ask what is gained from learning transformations between them (Table~\ref{tab:joint-scale-comparison}). ZoomST and No Cross retain comparable anatomical agreement at each scale, with mean AMI differences ranging from $-0.001$ to $0.016$. Both models show the same scale preference: finer neighborhoods yield higher agreement with tissue annotations, whereas coarser neighborhoods retain more physical neighbors. For ZoomST, AMI decreases from 0.585 at $k=8$ to 0.538 at $k=128$, while neighbor retention increases from 35.1\% to 62.5\%.
-
-The developmental readout reveals what cross-granularity supervision adds to these spatially coherent coarse representations. At $k=128$, stage-median Spearman correlation increases from $-0.143$ for No Cross to $0.381$ for ZoomST, and spot-level correlation increases from $-0.239$ to $0.354$. The gain is smaller at $k=32$; at $k=8$, stage-median correlations tie and No Cross has the higher spot-level correlation. Thus, learning relations between scales enriches developmental-stage ordering in coarse joint representations while retaining comparable tissue-identification performance.
-
-\begin{table}[!htbp]
-\centering\scriptsize
-\caption{\textbf{What cross-granularity learning retains at each scale.} Each metric is grouped across context sizes 8, 32, and 128. Both models use the joint representation at the indicated scale. AMI is mean $\pm$ sample SD across three clustering seeds after equally averaging eight sections; neighbor retention is the equal-section recovery of physical 32-nearest neighbors. The two Spearman correlations use the same 4,712 Brain observations. Bold marks the higher unrounded value between models at each scale, including ties. Protocol: Appendix~\ref{app:developmental-ordering}.}
-\label{tab:joint-scale-comparison}
-\setlength{\tabcolsep}{2.2pt}
-\renewcommand{\arraystretch}{1.18}
-\input{tables/joint_scale_comparison}
-\end{table}

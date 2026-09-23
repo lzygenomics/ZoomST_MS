@@ -1,16 +1,21 @@
-\subsection{Cross-granularity supervision improves correspondence among retained representations}
+\subsection{Cross-granularity correspondence and granularity-specific anatomy}
 \label{sec:objective-ablation}
 
-Cross-granularity prediction supplies supervision to the encoders as well as training a reusable transformation. We therefore test whether this supervision makes the retained fine and coarse descriptions easier to relate, before applying any transformation. Starting from the same base-pretrained checkpoint, we continue training separately on three sections with equal update budgets: the within-granularity objective alone, with coarse-support correspondence (CS), or with both CS and joint-distribution matching (JointMMD). Each model is evaluated on the section used for its continuation.
+Learning relationships should make descriptions easier to relate while leaving their distinct uses available. We examine these two properties through native-state correspondence and granularity-specific anatomical readouts.
 
-Two comparisons reveal how the directly encoded molecular states are organized across granularities. First, do locations with similar fine descriptions also have similar coarse descriptions? We measure overlap between their representation-space neighborhoods. Second, can a fine description retrieve the coarse description of the same tissue location? We measure same-location Recall@32. Both comparisons use the native states without the transition. Here, neighbor overlap relates two representation spaces; the physical-neighbor test in Section~\ref{sec:dual-view-identification} instead relates representations to tissue coordinates.
+\paragraph{Relational supervision organizes native-state correspondence.}
+Starting from a common base-pretrained checkpoint, equal-update continuations on three sections compare the within-granularity objective alone, with coarse-support correspondence (CS), and with both CS and JointMMD. Each continuation is evaluated on its corresponding adapted section. We test whether similar fine descriptions retain similar coarse neighbors, and whether a fine state retrieves the coarse state of the same location. Both neighbor overlap and same-location Recall@32 use directly encoded molecular states, without applying the transition or fitting an alignment.
 
-CS improves both correspondence readouts in all nine section--granularity-pair comparisons, and adding JointMMD further improves each comparison (Table~\ref{tab:objective-increments}). The complete objective increases $8\to128$ same-location retrieval by 6.6--8.3 percentage points over base-only continuation. On these three adapted sections, learning cross-granularity relationships makes local similarity and same-location correspondence more consistent between the retained fine and coarse descriptions. The complete continuation protocol and readout definitions are in Appendix~\ref{app:objective-ablation}.
+CS improves both readouts in all nine section--granularity-pair comparisons; adding JointMMD further improves every comparison (Table~\ref{tab:objective-correspondence-summary}). The full objective increases $8\to128$ same-location retrieval by 6.6--8.3 percentage points over base-only continuation. Thus, relational supervision changes the organization of the retained representations, not only the transformation that connects them. Appendix~\ref{app:objective-ablation} provides the full section-level scores and continuation protocol.
 
-\begin{table}[!ht]
+\begin{table}[!htbp]
 \centering\small
-\setlength{\tabcolsep}{3pt}
-\caption{\textbf{Retained-state correspondence under matched continuation.} Values are percentages. All settings use the same initialization, section, batch size and update budget. CS adds coarse-support supervision; CS+MMD is the complete cross-granularity objective. Bold marks the highest unrounded value per section, direction and readout, including ties.}
-\label{tab:objective-increments}
-\input{tables/objective_ablation_increments_EN}
+\caption{\textbf{Incremental gains in native cross-granularity correspondence.} Entries are ranges of within-section improvements across the three matched continuations, in percentage points. $+$CS compares CS with Base; $+$JointMMD compares CS+MMD with CS. All nine section--pair comparisons are retained in Table~\ref{tab:objective-increments}. Ranges are calculated from its reported scores.}
+\label{tab:objective-correspondence-summary}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.10}
+\input{tables/objective_correspondence_summary}
 \end{table}
+
+\input{sections/results_anatomy}
+\FloatBarrier
