@@ -1,0 +1,38 @@
+\ADLactivate
+\setlength{\dashlinedash}{1.5pt}
+\setlength{\dashlinegap}{2.2pt}
+\setlength{\arrayrulewidth}{0.25pt}
+\arrayrulecolor[gray]{0.76}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}c:c:c:c:c:c:c:c:c:c:c@{}}
+\arrayrulecolor{black}\toprule\arrayrulecolor[gray]{0.76}
+ & \multicolumn{9}{c}{(a) AMI $\uparrow$} & (b) $R_{32}\uparrow$ \\
+\arrayrulecolor{black}\cmidrule(lr){2-10}\cmidrule(l){11-11}\arrayrulecolor[gray]{0.76}
+Method & E9.5 & E10.5 & E11.5 & E12.5 & E13.5 & E14.5 & E15.5 & E16.5 & \shortstack{Mean\\AMI} & \shortstack{Neighbor\\retention} \\
+\arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
+\multicolumn{11}{c}{\textcolor[HTML]{2F65A7}{\textbf{ZoomST views}}} \\
+\textcolor[HTML]{2F65A7}{\textbf{Joint}} & \textbf{0.547} & \textbf{0.549} & \textbf{0.628} & \textbf{0.613} & \textbf{0.578} & \textbf{0.563} & \textbf{0.626} & 0.513 & \textbf{0.577} & \textbf{0.527} \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.014$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} & {\fontsize{7}{8}\selectfont $\pm 0.015$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.019$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} &  \\
+\textcolor[HTML]{2F65A7}{\textbf{Molecular}} & 0.486 & 0.516 & \textbf{0.608} & \textbf{0.614} & 0.541 & 0.556 & \textbf{0.625} & 0.497 & 0.555 & \textbf{0.502} \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.016$} & {\fontsize{7}{8}\selectfont $\pm 0.014$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} &  \\
+\textcolor[HTML]{2F65A7}{\textbf{Spatial}} & \textbf{0.556} & 0.534 & \textbf{0.615} & \textbf{0.607} & \textbf{0.579} & 0.558 & \textbf{0.614} & \textbf{0.532} & \textbf{0.574} & \textbf{0.523} \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.017$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} &  \\
+\arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
+\multicolumn{11}{c}{\textbf{Frozen pretrained}} \\
+Novae & 0.371 & 0.390 & 0.444 & 0.447 & 0.432 & 0.450 & 0.494 & 0.449 & 0.435 & 0.313 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} &  \\
+SToFM & 0.211 & 0.262 & 0.291 & 0.307 & 0.334 & 0.407 & 0.405 & 0.331 & 0.319 & 0.033 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.017$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} &  \\
+\arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
+\multicolumn{11}{c}{\textbf{Target-fitted}} \\
+GraphST & 0.538 & 0.534 & 0.502 & 0.509 & 0.386 & 0.453 & 0.422 & 0.403 & 0.468 & 0.268 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.017$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} &  \\
+BANKSY & 0.540 & \textbf{0.539} & 0.573 & 0.583 & \textbf{0.593} & \textbf{0.572} & 0.614 & \textbf{0.526} & \textbf{0.567} & 0.483 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.021$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.022$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.015$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} &  \\
+MENDER & 0.530 & 0.531 & 0.561 & 0.582 & 0.573 & 0.535 & 0.600 & 0.509 & 0.553 & 0.354 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.016$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
+STAGATE & \textbf{0.556} & \textbf{0.544} & 0.559 & 0.585 & 0.544 & \textbf{0.579} & 0.604 & \textbf{0.540} & 0.564 & 0.354 \\
+ & {\fontsize{7}{8}\selectfont $\pm 0.028$} & {\fontsize{7}{8}\selectfont $\pm 0.023$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.017$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.021$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.0005$} &  \\
+\arrayrulecolor{black}\bottomrule\arrayrulecolor[gray]{0.76}
+\end{tabular*}
+\arrayrulecolor{black}
+\ADLinactivate

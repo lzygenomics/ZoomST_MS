@@ -12,7 +12,7 @@ The field receives the current state and absolute granularity coordinate, allowi
 \subsection{Soft distributional equivariance from nested observations}
 \label{sec:granularity-supervision}
 
-Since broader context is not uniquely determined by the fine observation alone, we relate transformed and directly encoded coarse states through the soft statistical constraint~\citep{lenc2015equivariance}
+Rather than enforcing exact pointwise equality between transformed and directly encoded coarse states, we constrain their relationship statistically over matched locations~\citep{lenc2015equivariance}:
 \begin{equation}
 \operatorname{Law}\bigl(Z_a,T_{a\to b}(Z_a)\bigr)
 \;\approx\;\operatorname{Law}(Z_a,Z_b),

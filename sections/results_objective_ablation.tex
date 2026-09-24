@@ -1,21 +1,5 @@
-\subsection{Cross-granularity correspondence and granularity-specific anatomy}
+\subsection{Granularity-specific anatomical uses}
 \label{sec:objective-ablation}
-
-Learning relationships should make descriptions easier to relate while leaving their distinct uses available. We examine these two properties through native-state correspondence and granularity-specific anatomical readouts.
-
-\paragraph{Relational supervision organizes native-state correspondence.}
-Starting from a common base-pretrained checkpoint, equal-update continuations on three sections compare the within-granularity objective alone, with coarse-support correspondence (CS), and with both CS and JointMMD. Each continuation is evaluated on its corresponding adapted section. We test whether similar fine descriptions retain similar coarse neighbors, and whether a fine state retrieves the coarse state of the same location. Both neighbor overlap and same-location Recall@32 use directly encoded molecular states, without applying the transition or fitting an alignment.
-
-CS improves both readouts in all nine section--granularity-pair comparisons; adding JointMMD further improves every comparison (Table~\ref{tab:objective-correspondence-summary}). The full objective increases $8\to128$ same-location retrieval by 6.6--8.3 percentage points over base-only continuation. Thus, relational supervision changes the organization of the retained representations, not only the transformation that connects them. Appendix~\ref{app:objective-ablation} provides the full section-level scores and continuation protocol.
-
-\begin{table}[!htbp]
-\centering\small
-\caption{\textbf{Incremental gains in native cross-granularity correspondence.} Entries are ranges of within-section improvements across the three matched continuations, in percentage points. $+$CS compares CS with Base; $+$JointMMD compares CS+MMD with CS. All nine section--pair comparisons are retained in Table~\ref{tab:objective-increments}. Ranges are calculated from its reported scores.}
-\label{tab:objective-correspondence-summary}
-\setlength{\tabcolsep}{6pt}
-\renewcommand{\arraystretch}{1.10}
-\input{tables/objective_correspondence_summary}
-\end{table}
 
 \input{sections/results_anatomy}
 \FloatBarrier

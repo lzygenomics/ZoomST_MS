@@ -1,34 +1,19 @@
-\section{Matched continuation study}
+\section{Objective ablation on MOSTA}
 \label{app:objective-ablation}
 
-Matched continuation evaluates native cross-granularity correspondence on three adapted sections using one training seed. Section assignments are listed in Table~\ref{tab:evaluation_protocol}. Both readouts use the same queries and candidates across objective settings; contrasts compare CS with base-only continuation and CS+MMD with CS across all nine section--direction conditions.
+We compare No Cross, CS, and ZoomST using a common initialization, the same training data and training budget, and identical training settings apart from the loss terms. No Cross uses within-granularity learning; CS adds coarse-support supervision; ZoomST further adds JointMMD. Evaluation uses frozen encoders and the held-out MOSTA split from Section~\ref{sec:developmental-information}, with identical evaluation observations and readout settings across the three models. All readouts use Joint representations at granularities 8, 32, and 128.
 
-\paragraph{Sections and matched continuations.}
-E12.5 E2S1, E14.5 E1S1, and E16.5 E1S1 contain 23,640, 102,519, and 121,767 positions. Each of the three objective settings in Section~\ref{sec:objective-ablation} is adapted separately on each section for 2,000 updates, with batch size 32 and training seed 42. Every continuation starts from the same base-pretrained checkpoint with a fresh optimizer and a common learning-rate schedule. The encoder is trainable; settings with cross-granularity supervision use the same shared ODE transition. The base-only setting trains the retained encoders without a transition objective. CS and JointMMD have final weight one when included. Evaluation uses the final checkpoint after the matched update budget.
-
-\paragraph{Native neighborhood overlap.}
-We select $Q=2{,}048$ query positions at evenly spaced original row indices and retain every section position as a candidate. Let $N_{32}^{a}(i)$ denote the 32 nearest positions to $e_{i,a}$ within the native scale-$a$ array, excluding row $i$. With an analogous set for scale $b$, the readout is
+Table~\ref{tab:mosta-objective-ablation}a follows the anatomical clustering, Brain developmental ordering, and stage-prediction protocols in Appendix~\ref{app:dual-view}--\ref{app:developmental-ordering}. Panel (b) measures cross-granularity similarity structure using centered linear CKA~\citep{kornblith2019similarity}. For each model and granularity, we apply featurewise z-score standardization over all positions within each section. We then compute CKA on the same 2,048 positions, selected at evenly spaced original row indices and shared across models and granularities. For the column-centered matrices $X$ and $Y$,
 \[
-R_{32}^{a,b}=\frac1Q\sum_{i\in\mathcal Q}
-\frac{|N_{32}^{a}(i)\cap N_{32}^{b}(i)|}{32}.
+\mathrm{CKA}(X,Y)=\frac{\|X^\top Y\|_F^2}{\|X^\top X\|_F\,\|Y^\top Y\|_F}.
 \]
-Both neighbor searches use exact Euclidean distances in the original 256-dimensional molecular states. Exact ties are resolved by original row index. The readout compares the local similarity relationships of two retained representations.
 
-\paragraph{Native paired retrieval.}
-For the same queries, rank every native coarse state $e_{j,b}$ by its Euclidean distance to the native fine query $e_{i,a}$. The correct candidate is $j=i$, which remains in the gallery. Writing this candidate's rank as $r_i^{a\to b}$, define
-\[
-\operatorname{Recall@32}^{a\to b}=\frac1Q\sum_{i\in\mathcal Q}
-\mathbf1[r_i^{a\to b}\leq32].
-\]
-Exact ties again use original row index. The readout uses the retained molecular states directly, with no fitted alignment or transformation in the query. It assesses position identity without anatomical labels. Candidate counts differ between sections, so objective increments are compared within each section.
-
-\paragraph{Section-level scores and incremental summary.}
-Table~\ref{tab:objective-increments} gives all nine matched section--pair comparisons. The compact main-text Table~\ref{tab:objective-correspondence-summary} reports the minimum and maximum within-section gains for each pair, separately for CS versus Base and CS+MMD versus CS. These ranges summarize the reported scores; they are not confidence intervals or averages over candidate galleries.
+Adding JointMMD to CS reduces stage-prediction MAE and increases spot-level DPT correlation at all three granularities, with the largest gains at granularity 128. AMI increases at granularities 8 and 32 and remains similar at granularity 128. CKA increases for all three granularity pairs, with improvements in 22 of the 24 section--pair comparisons. Together, these results show that JointMMD improves developmental readouts and strengthens the similarity structure shared across granularities.
 
 \begin{table}[!htbp]
-\centering\small
-\setlength{\tabcolsep}{3pt}
-\caption{\textbf{Retained-state correspondence under matched continuation.} Values are percentages. All settings use the same initialization, section, batch size and update budget. CS adds coarse-support supervision; CS+MMD is the complete cross-granularity objective. Bold marks the highest unrounded value per section, direction and readout, including ties.}
-\label{tab:objective-increments}
-\input{tables/objective_ablation_increments_EN}
+\centering
+\caption{\textbf{Controlled objective ablation on MOSTA.} \textbf{(a)} Joint AMI, Brain spot-level DPT--stage Spearman correlation, and Brain stage-prediction MAE. AMI is averaged equally across the eight held-out sections within each clustering run; $\pm$ denotes SD over downstream clustering initializations (seeds 42, 43, and 44). DPT uses the shared 4,712-spot Brain cohort. Stage MAE is in embryonic days and uses the same evaluation folds and equal-section aggregation as Table~\ref{tab:cross-granularity-development}b. \textbf{(b)} Centered linear CKA for the granularity pairs $8\leftrightarrow32$, $8\leftrightarrow128$, and $32\leftrightarrow128$, reported as equal-section mean $\pm$ sample SD across the eight held-out sections. Bold marks the best mean in each column, determined from unrounded values.}
+\label{tab:mosta-objective-ablation}
+\includegraphics[width=\linewidth]{figures/mosta_objective_ablation.pdf}
 \end{table}
+\FloatBarrier

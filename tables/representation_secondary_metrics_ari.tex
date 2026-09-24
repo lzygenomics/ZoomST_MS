@@ -1,35 +1,35 @@
-\begin{tabular}{lcccccccccc}
+\begin{tabular}{lccccccccc}
 \toprule
- & \multicolumn{4}{c}{ZoomST Versions} & \multicolumn{2}{c}{Frozen pretrained} & \multicolumn{4}{c}{Target-fitted} \\
-\cmidrule(lr){2-5}\cmidrule(lr){6-7}\cmidrule(lr){8-11}
-Stage & Joint & \shortstack{Molecular\\View} & \shortstack{Spatial\\View} & \shortstack{No Cross\\Ablation} & Novae & SToFM & GraphST & BANKSY & MENDER & STAGATE \\
+ & \multicolumn{3}{c}{ZoomST views} & \multicolumn{2}{c}{Frozen pretrained} & \multicolumn{4}{c}{Target-fitted} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-10}
+Stage & Joint & \shortstack{Molecular\\View} & \shortstack{Spatial\\View} & Novae & SToFM & GraphST & BANKSY & MENDER & STAGATE \\
 \midrule
-E9.5 & \textbf{0.391} & 0.316 & \textbf{0.400} & 0.362 & 0.233 & 0.107 & \textbf{0.418} & 0.353 & 0.367 & 0.391 \\
- & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.024$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.031$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.039$} \\
+E9.5 & \textbf{0.391} & 0.316 & \textbf{0.400} & 0.233 & 0.107 & \textbf{0.418} & 0.353 & 0.367 & 0.391 \\
+ & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.024$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.031$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.039$} \\
 \addlinespace[2pt]
-E10.5 & 0.290 & 0.257 & 0.270 & 0.291 & 0.193 & 0.127 & \textbf{0.293} & 0.285 & \textbf{0.297} & \textbf{0.314} \\
- & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.011$} & {\scriptsize $\pm 0.003$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.027$} & {\scriptsize $\pm 0.005$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.033$} \\
+E10.5 & 0.290 & 0.257 & 0.270 & 0.193 & 0.127 & \textbf{0.293} & 0.285 & \textbf{0.297} & \textbf{0.314} \\
+ & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.003$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.027$} & {\scriptsize $\pm 0.005$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.033$} \\
 \addlinespace[2pt]
-E11.5 & \textbf{0.376} & \textbf{0.364} & \textbf{0.356} & 0.344 & 0.270 & 0.147 & 0.302 & 0.325 & 0.282 & 0.329 \\
- & {\scriptsize $\pm 0.007$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.029$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.022$} \\
+E11.5 & \textbf{0.376} & \textbf{0.364} & \textbf{0.356} & 0.270 & 0.147 & 0.302 & 0.325 & 0.282 & 0.329 \\
+ & {\scriptsize $\pm 0.007$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.029$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.022$} \\
 \addlinespace[2pt]
-E12.5 & \textbf{0.374} & \textbf{0.423} & 0.363 & \textbf{0.374} & 0.281 & 0.172 & 0.272 & 0.365 & 0.331 & 0.351 \\
- & {\scriptsize $\pm 0.023$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.011$} & {\scriptsize $\pm 0.014$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.020$} & {\scriptsize $\pm 0.027$} & {\scriptsize $\pm 0.019$} & {\scriptsize $\pm 0.018$} & {\scriptsize $\pm 0.034$} \\
+E12.5 & \textbf{0.374} & \textbf{0.423} & 0.363 & 0.281 & 0.172 & 0.272 & \textbf{0.365} & 0.331 & 0.351 \\
+ & {\scriptsize $\pm 0.023$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.011$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.020$} & {\scriptsize $\pm 0.027$} & {\scriptsize $\pm 0.019$} & {\scriptsize $\pm 0.018$} & {\scriptsize $\pm 0.034$} \\
 \addlinespace[2pt]
-E13.5 & \textbf{0.334} & 0.316 & 0.329 & 0.318 & 0.254 & 0.158 & 0.228 & \textbf{0.368} & \textbf{0.344} & 0.313 \\
- & {\scriptsize $\pm 0.022$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.003$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.052$} & {\scriptsize $\pm 0.030$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.016$} \\
+E13.5 & \textbf{0.334} & 0.316 & 0.329 & 0.254 & 0.158 & 0.228 & \textbf{0.368} & \textbf{0.344} & 0.313 \\
+ & {\scriptsize $\pm 0.022$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.052$} & {\scriptsize $\pm 0.030$} & {\scriptsize $\pm 0.012$} & {\scriptsize $\pm 0.016$} \\
 \addlinespace[2pt]
-E14.5 & 0.324 & \textbf{0.339} & 0.288 & 0.319 & 0.274 & 0.231 & 0.278 & \textbf{0.331} & 0.285 & \textbf{0.345} \\
- & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.030$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.032$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.035$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.043$} \\
+E14.5 & 0.324 & \textbf{0.339} & 0.288 & 0.274 & 0.231 & 0.278 & \textbf{0.331} & 0.285 & \textbf{0.345} \\
+ & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.030$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.015$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.035$} & {\scriptsize $\pm 0.016$} & {\scriptsize $\pm 0.026$} & {\scriptsize $\pm 0.043$} \\
 \addlinespace[2pt]
-E15.5 & 0.387 & \textbf{0.391} & 0.368 & 0.384 & 0.332 & 0.202 & 0.212 & \textbf{0.391} & \textbf{0.394} & 0.377 \\
- & {\scriptsize $\pm 0.007$} & {\scriptsize $\pm 0.037$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.029$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.019$} & {\scriptsize $\pm 0.005$} \\
+E15.5 & 0.387 & \textbf{0.391} & 0.368 & 0.332 & 0.202 & 0.212 & \textbf{0.391} & \textbf{0.394} & 0.377 \\
+ & {\scriptsize $\pm 0.007$} & {\scriptsize $\pm 0.037$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.017$} & {\scriptsize $\pm 0.019$} & {\scriptsize $\pm 0.005$} \\
 \addlinespace[2pt]
-E16.5 & 0.283 & 0.298 & \textbf{0.304} & 0.284 & 0.249 & 0.193 & 0.219 & \textbf{0.315} & 0.297 & \textbf{0.321} \\
- & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.003$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.044$} & {\scriptsize $\pm 0.014$} \\
+E16.5 & 0.283 & 0.298 & \textbf{0.304} & 0.249 & 0.193 & 0.219 & \textbf{0.315} & 0.297 & \textbf{0.321} \\
+ & {\scriptsize $\pm 0.025$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.013$} & {\scriptsize $\pm 0.044$} & {\scriptsize $\pm 0.014$} \\
 \addlinespace[2pt]
-Mean ARI & \textbf{0.345} & 0.338 & 0.335 & 0.335 & 0.261 & 0.167 & 0.278 & \textbf{0.342} & 0.325 & \textbf{0.343} \\
- & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.004$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.0005$} & {\scriptsize $\pm 0.005$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.004$} \\
+Mean ARI & \textbf{0.345} & 0.338 & 0.335 & 0.261 & 0.167 & 0.278 & \textbf{0.342} & 0.325 & \textbf{0.343} \\
+ & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.009$} & {\scriptsize $\pm 0.002$} & {\scriptsize $\pm 0.001$} & {\scriptsize $\pm 0.0005$} & {\scriptsize $\pm 0.005$} & {\scriptsize $\pm 0.008$} & {\scriptsize $\pm 0.006$} & {\scriptsize $\pm 0.004$} \\
 \addlinespace[2pt]
 \bottomrule
 \end{tabular}
