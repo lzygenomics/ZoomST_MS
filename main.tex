@@ -26,6 +26,19 @@
 \usepackage{url}
 \hypersetup{hidelinks}
 
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{0pt}
+\makeatletter
+\renewcommand{\fnum@figure}{\textbf{\figurename~\thefigure}}
+\renewcommand{\fnum@table}{\textbf{\tablename~\thetable}}
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{10pt plus 2pt minus 2pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
 \definecolor{flowblue}{HTML}{2F65A7}
 \definecolor{flowteal}{HTML}{2A9D8F}
 \definecolor{floworange}{HTML}{E07A35}
@@ -62,6 +75,9 @@
 \input{sections/results}
 \input{sections/discussion}
 \clearpage
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
 \input{sections/statements}
 
 \bibliography{references}
@@ -69,6 +85,12 @@
 
 \clearpage
 \appendix
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\renewcommand{\thefigure}{\thesection\arabic{figure}}
+\renewcommand{\thetable}{\thesection\arabic{table}}
+\renewcommand{\theHfigure}{appendix.\thesection.\arabic{figure}}
+\renewcommand{\theHtable}{appendix.\thesection.\arabic{table}}
 \input{sections/appendix}
 
 \end{document}

@@ -1,24 +1,26 @@
-\subsection{Continuous cross-granularity transformations}
+\subsection{Continuous Cross-Granularity Representation Transformation}
 \label{sec:coarse-support}
 
-We parameterize a shared rule for representation change with a neural ODE~\citep{chen2018neuralode}. Its coordinate $u(r)=\log_2(r/8)/4$ maps granularities 8, 32 and 128 to $0,\tfrac12,1$; equal multiplicative changes span equal intervals. Starting from a molecular state at granularity $a$,
+To model how molecular representations change across spatial granularities, we parameterize a shared continuous transformation with a neural ODE~\citep{chen2018neuralode}. We define a normalized log-granularity coordinate $u(r)=\frac{\log_2(r/8)}{4}$, which maps the training granularities $r\in\{8,32,128\}$ to $0$, $\frac{1}{2}$, and $1$, respectively, so that equal multiplicative changes in neighborhood size correspond to equal intervals.
+
+We define the continuous transformation from the molecular representation $e_{i,a}$ at source granularity $a$ to target granularity $b$ by integrating a learned vector field $f_\theta$ over the granularity coordinate,
 \begin{equation}
 \frac{dz(u)}{du}=f_\theta(z(u),u),\qquad
 z(u(a))=e_{i,a},\qquad T_{a\to b}(e_{i,a})=z(u(b)).
 \label{eq:granularity-ode}
 \end{equation}
-The field receives the current state and absolute granularity coordinate, allowing changes to depend on both tissue context and observation range. Source and target granularities set the integration limits; every query uses the same parameters. The field is a multilayer perceptron initialized to zero, so training starts from identity transformations. We use fourth-order Runge--Kutta integration (Appendix~\ref{app:hyperparameters}).
+The shared vector field defines a continuous family of cross-granularity transformations rather than separate mappings for individual granularity pairs. It is implemented as a multilayer perceptron and initialized to zero so that training starts from identity transformations. We use fourth-order Runge--Kutta integration, with implementation details provided in Appendix~\ref{app:hyperparameters}.
 
 \subsection{Soft distributional equivariance from nested observations}
 \label{sec:granularity-supervision}
 
-Rather than enforcing exact pointwise equality between transformed and directly encoded coarse states, we constrain their relationship statistically over matched locations~\citep{lenc2015equivariance}:
+Rather than enforcing exact pointwise equality between transformed and directly encoded coarse states, we constrain their relationship statistically over matched locations:
 \begin{equation}
 \operatorname{Law}\bigl(Z_a,T_{a\to b}(Z_a)\bigr)
 \;\approx\;\operatorname{Law}(Z_a,Z_b),
 \label{eq:granularity-equivariance}
 \end{equation}
-where $(Z_a,Z_b)$ are directly encoded states at the same sampled location. Including the source preserves fine--coarse associations: shuffling coarse states changes their pairing while preserving their marginal distribution. Two complementary losses implement this relation.
+where $(Z_a,Z_b)$ are directly encoded states at the same sampled location. Including the source preserves fine--coarse associations: shuffling coarse states changes their pairing while preserving their marginal distribution. Two complementary losses implement this relation: coarse-support correspondence aligns predictions from fine observations within each support to a common coarse target, while JointMMD matches fine--coarse associations across locations.
 
 \paragraph{Coarse-support correspondence.}
 A coarse support supplies a common target for fine descriptions centered within it. For $B$ focal centers, define $y_{i,b}=\stopgrad(e_{i,b})$, where $\stopgrad$ stops gradients, and $\Pset=\{(8,32),(8,128),(32,128)\}$. We minimize

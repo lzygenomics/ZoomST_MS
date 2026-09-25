@@ -1,7 +1,7 @@
 \begin{table}[!htbp]
 \begingroup\centering\fontsize{8}{9}\selectfont
 \setlength{\tabcolsep}{1.1pt}\renewcommand{\arraystretch}{1.02}
-\caption{\textbf{Distinct anatomical structures favor coarse or fine Spatial context.} Selected examples from the complete 43-region benchmark in Table~\ref{tab:regional-spatial-iou-full}. The upper group favors granularity 128; the lower group favors granularity 8. In each example, the preferred ZoomST granularity also attains the highest IoU among the compared methods. Values are means with sample SD below across $n$ sections, after averaging three clustering seeds per section; single-section regions have one value. $H_{128}$ is neighborhood homogeneity. Bold marks the highest IoU across columns; underlining marks the best ZoomST granularity.}\label{tab:regional-spatial-iou}
+\caption{\textbf{Distinct anatomical structures favor coarse or fine Spatial context.} Selected examples from the 43-region benchmark. The upper group favors granularity 128; the lower group favors granularity 8. In each example, the preferred ZoomST granularity also attains the highest IoU among the compared methods. Values are means with sample SD below across $n$ sections, after averaging three clustering seeds per section; single-section regions have one value. $H_{128}$ is neighborhood homogeneity. Bold marks the highest IoU across columns; underlining marks the best ZoomST granularity.}\label{tab:regional-spatial-iou}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.175\linewidth}cc*{9}{c}@{}}
 \toprule
  & & & \multicolumn{3}{c}{ZoomST Spatial} & \multicolumn{2}{c}{Frozen pretrained} & \multicolumn{4}{c}{Target-fitted} \\

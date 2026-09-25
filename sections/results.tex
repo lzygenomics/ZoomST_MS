@@ -1,11 +1,24 @@
 \section{Results}
 \label{sec:results}
 
-We evaluate two outcomes of cross-granularity pretraining: the tissue information retained in each representation and the predictive relationships learned between representations. We first establish anatomical transfer to held-out sections, then examine how cross-granularity learning enriches developmental information while retaining distinct anatomical uses. We finally test transformations at trained and unseen target granularities and use their predicted responses to characterize spatial context dependence.
+\begin{table}[H]
+\centering
+\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI; Avg.: mean across sections. \textbf{(b)} NR: mean physical 32-neighbor retention. Bold marks the top three scores per column. Protocols: Appendix~\ref{app:dual-view}.}
+\label{tab:representation-summary}
+\label{tab:dual-view-sections}
+\begin{minipage}{0.90\linewidth}
+\begingroup
+\fontsize{8}{9}\selectfont
+\setlength{\tabcolsep}{2pt}
+\setlength{\aboverulesep}{0.2ex}
+\setlength{\belowrulesep}{0.3ex}
+\renewcommand{\arraystretch}{1.04}
+\input{tables/representation_summary_compact}
+\endgroup
+\end{minipage}
+\end{table}
 
 \input{sections/results_dual_view}
 \input{sections/results_developmental_ordering}
-\input{sections/results_objective_ablation}
-\input{sections/results_granularity_transfer}
-\input{sections/results_scale_continuum}
-\FloatBarrier
+\input{sections/results_context_zoom}
+\flushbottom

@@ -5,23 +5,18 @@
 The final MOSTA model specified in Section~\ref{sec:experiments} supplies native 256-dimensional molecular states without standardization. Data use follows Table~\ref{tab:evaluation_protocol}.
 
 \paragraph{Same-location state prediction.}
-For every position in each section, define $m_i^T=d^{-1}\|T_{a\to b}(e_{i,a})-e_{i,b}\|_2^2$ and $m_i^0=d^{-1}\|e_{i,a}-e_{i,b}\|_2^2$. Figure~\ref{fig:granularity-transfer}A reports $\rho_{ab}=\sum_i m_i^T/\sum_i m_i^0$ for each section. The unchanged source is the no-transformation reference; the target is directly encoded from the actual broader neighborhood at the same location. Improved-position fractions use $n^{-1}\sum_i\mathbf 1[m_i^T<m_i^0]$. Scores are computed over all positions in each evaluated section. This evaluation differs from training, where all centers within each coarse support contribute sources.
+For every position in each section, define $m_i^T=d^{-1}\|T_{a\to b}(e_{i,a})-e_{i,b}\|_2^2$ and $m_i^0=d^{-1}\|e_{i,a}-e_{i,b}\|_2^2$. The unchanged source is the no-transformation reference; the target is directly encoded from the actual broader neighborhood at the same location. MSE averages over all positions in each section. Across all 24 held-out section--direction conditions, transformed states have lower target MSE than unchanged sources.
+
+Figures~\ref{fig:granularity-query-summary}a and~\ref{fig:granularity-transfer}a show the corresponding absolute MSEs. Each paired point is one section's mean over the three trained relations, with each relation first averaged over all positions; the eight section means form each box.
 
 \paragraph{Projected joint association.}
-Each section supplies the same fixed 2,048 positions, partitioned into four disjoint batches of 512. For each batch, correct predicted pairings, unchanged-source controls, and 20 shuffled predictions are compared with directly encoded fine--coarse pairs. Each shuffle has no fixed points and permutes only predicted destinations, preserving their marginal distribution. The product kernel uses source and target bandwidths from the corresponding observed states, shared across controls, with the settings in Appendix~\ref{app:hyperparameters}.
+Each section supplies the same fixed 2,048 positions, partitioned into four disjoint batches of 512. For each batch, correct predicted pairings and 20 shuffled predictions are compared with directly encoded fine--coarse pairs. Each shuffle has no fixed points and permutes only predicted destinations, preserving their marginal distribution. The product kernel uses source and target bandwidths from the corresponding observed states, shared across controls, with the settings in Appendix~\ref{app:hyperparameters}.
 
-We evaluate the checkpoint's training projection and eight fixed orthogonal projections with seeds 2026091501--2026091508. Figure~\ref{fig:granularity-transfer}B divides the mean correct-pair MMD by the mean shuffled MMD after averaging batches and the eight fresh projections within each section. Correct pairing improves on shuffling in all 864 batch--projection--direction conditions. Compared with the unchanged source on the training projection, transformation lowers joint discrepancy in 21 of 24 section--direction conditions. All three exceptions are in E12.5 E2S1; its projected joint discrepancy increases for each training direction. Table~\ref{tab:granularity-transfer-sections} reports every section and direction.
+We evaluate the checkpoint's training projection and eight fixed orthogonal projections. Correct source--prediction pairings yield lower joint discrepancy than shuffled pairings across all evaluated batch--projection--direction conditions. Figure~\ref{fig:granularity-transfer}b compares absolute MMDs, first averaged over batches and the eight fresh projections within each section and direction, then equally over the three trained directions within each section.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/granularity_transfer.pdf}
-\caption{\textbf{Predictive relationships across held-out tissue sections.} \textbf{A}, Target-MSE ratio of transformed to untransformed fine states, using the same directly encoded coarse reference. \textbf{B}, Joint-MMD ratio of correct to shuffled predicted pairings, averaged over four batches and eight projections unused in training. Each line denotes one section; values below one favor the learned prediction or correct pairing.}
+\caption{\textbf{Predictive relationships across held-out tissue sections.} \textbf{a}, Target MSE for unchanged sources and ZoomST predictions. \textbf{b}, Joint MMD for shuffled and correct predicted pairings. Points are means over the three trained granularity pairs for each of eight sections; lines connect the same section. Boxes show medians, interquartile ranges and 1.5-IQR whiskers.}
 \label{fig:granularity-transfer}
 \end{figure}
-
-\begin{table}[!htbp]
-\centering\small
-\caption{\textbf{Coarse-state prediction on every held-out section.} MSE ratio compares transformed and unchanged sources against the same encoded coarse target. Improved is the percentage of positions with lower MSE. Paired/shuffled is the joint-MMD ratio averaged over batches and fresh projections.}
-\label{tab:granularity-transfer-sections}
-\input{tables/ode_endpoint_sections}
-\end{table}

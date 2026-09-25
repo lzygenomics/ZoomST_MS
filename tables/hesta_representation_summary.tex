@@ -3,41 +3,26 @@
 \setlength{\dashlinegap}{2.2pt}
 \setlength{\arrayrulewidth}{0.25pt}
 \arrayrulecolor[gray]{0.76}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}c:c:c:c:c:c:c:c:c:c@{}}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}c:c:c:c:c:c:c:c:c:c:c@{}}
 \arrayrulecolor{black}\toprule\arrayrulecolor[gray]{0.76}
- & \multicolumn{8}{c}{(a) AMI $\uparrow$} & (b) $R_{32}\uparrow$ \\
-\arrayrulecolor{black}\cmidrule(lr){2-9}\cmidrule(l){10-10}\arrayrulecolor[gray]{0.76}
-Method & CS12-13 & CS14-15 & CS17 & CS18 & CS19 & CS20 & CS23 & \shortstack{Mean\\AMI} & \shortstack{Neighbor\\retention} \\
+ & & \multicolumn{8}{c}{(a) AMI $\uparrow$} & (b) $R_{32}\uparrow$ \\
+\arrayrulecolor{black}\cmidrule(lr){3-10}\cmidrule(l){11-11}\arrayrulecolor[gray]{0.76}
+Group & Method & CS12-13 & CS14-15 & CS17 & CS18 & CS19 & CS20 & CS23 & Avg. & NR \\
 \arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
-\multicolumn{10}{c}{\textcolor[HTML]{2F65A7}{\textbf{ZoomST views}}} \\
-\textcolor[HTML]{2F65A7}{\textbf{Joint}} & \textbf{0.556} & \textbf{0.583} & \textbf{0.517} & \textbf{0.569} & \textbf{0.536} & \textbf{0.593} & \textbf{0.550} & \textbf{0.558} & \textbf{0.495} \\
- & {\fontsize{7}{8}\selectfont $\pm 0.021$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.016$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} &  \\
-\textcolor[HTML]{2F65A7}{\textbf{Molecular}} & \textbf{0.550} & \textbf{0.556} & \textbf{0.495} & \textbf{0.553} & \textbf{0.524} & \textbf{0.553} & \textbf{0.527} & \textbf{0.537} & \textbf{0.458} \\
- & {\fontsize{7}{8}\selectfont $\pm 0.020$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.015$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-\textcolor[HTML]{2F65A7}{\textbf{Spatial}} & \textbf{0.556} & \textbf{0.565} & \textbf{0.523} & \textbf{0.563} & \textbf{0.548} & \textbf{0.574} & \textbf{0.533} & \textbf{0.552} & \textbf{0.494} \\
- & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} &  \\
+\multirow{3}{*}{\textcolor[HTML]{2F65A7}{\textbf{\shortstack{ZoomST\\views}}}} & \textcolor[HTML]{2F65A7}{\textbf{Joint}} & \textbf{0.556} & \textbf{0.583} & \textbf{0.517} & \textbf{0.569} & \textbf{0.536} & \textbf{0.593} & \textbf{0.550} & \textbf{0.558} & \textbf{0.495} \\
+ & \textcolor[HTML]{2F65A7}{\textbf{Molecular}} & \textbf{0.550} & \textbf{0.556} & \textbf{0.495} & \textbf{0.553} & \textbf{0.524} & \textbf{0.553} & \textbf{0.527} & \textbf{0.537} & \textbf{0.458} \\
+ & \textcolor[HTML]{2F65A7}{\textbf{Spatial}} & \textbf{0.556} & \textbf{0.565} & \textbf{0.523} & \textbf{0.563} & \textbf{0.548} & \textbf{0.574} & \textbf{0.533} & \textbf{0.552} & \textbf{0.494} \\
 \arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
-\multicolumn{10}{c}{\textbf{Frozen pretrained}} \\
-Novae & 0.338 & 0.331 & 0.376 & 0.283 & 0.382 & 0.419 & 0.423 & 0.365 & 0.215 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-SToFM & 0.170 & 0.205 & 0.270 & 0.175 & 0.289 & 0.257 & 0.320 & 0.241 & 0.017 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.020$} & {\fontsize{7}{8}\selectfont $\pm 0.011$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} &  \\
-scGPT-spatial & 0.342 & 0.384 & 0.416 & 0.366 & 0.447 & 0.438 & 0.490 & 0.412 & 0.040 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.010$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-TERRA Cell & 0.228 & 0.279 & 0.358 & 0.267 & 0.382 & 0.338 & 0.393 & 0.321 & 0.021 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.007$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.001$} &  \\
-TERRA Nbh. & 0.327 & 0.410 & 0.417 & 0.389 & 0.464 & 0.438 & 0.478 & 0.418 & 0.226 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.017$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.016$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-TERRA S-cell & 0.318 & 0.416 & 0.417 & 0.411 & 0.471 & 0.457 & 0.486 & 0.425 & 0.223 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.022$} & {\fontsize{7}{8}\selectfont $\pm 0.016$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-CellWorld & 0.285 & 0.228 & 0.322 & 0.252 & 0.289 & 0.321 & 0.376 & 0.296 & 0.030 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.0004$} &  \\
+\multirow{7}{*}{\textbf{\shortstack{Frozen\\pretrained}}} & Novae & 0.338 & 0.331 & 0.376 & 0.283 & 0.382 & 0.419 & 0.423 & 0.365 & 0.215 \\
+ & SToFM & 0.170 & 0.205 & 0.270 & 0.175 & 0.289 & 0.257 & 0.320 & 0.241 & 0.017 \\
+ & scGPT-spatial & 0.342 & 0.384 & 0.416 & 0.366 & 0.447 & 0.438 & 0.490 & 0.412 & 0.040 \\
+ & TERRA Cell & 0.228 & 0.279 & 0.358 & 0.267 & 0.382 & 0.338 & 0.393 & 0.321 & 0.021 \\
+ & TERRA Nbh. & 0.327 & 0.410 & 0.417 & 0.389 & 0.464 & 0.438 & 0.478 & 0.418 & 0.226 \\
+ & TERRA S-cell & 0.318 & 0.416 & 0.417 & 0.411 & 0.471 & 0.457 & 0.486 & 0.425 & 0.223 \\
+ & CellWorld & 0.285 & 0.228 & 0.322 & 0.252 & 0.289 & 0.321 & 0.376 & 0.296 & 0.030 \\
 \arrayrulecolor{black}\midrule\arrayrulecolor[gray]{0.76}
-\multicolumn{10}{c}{\textbf{Target-fitted}} \\
-DECIPHER Ctr. & 0.402 & 0.416 & 0.476 & 0.331 & 0.483 & 0.465 & 0.469 & 0.434 & 0.037 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.002$} & {\fontsize{7}{8}\selectfont $\pm 0.005$} & {\fontsize{7}{8}\selectfont $\pm 0.013$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.008$} & {\fontsize{7}{8}\selectfont $\pm 0.002$} &  \\
-DECIPHER Ctx. & 0.475 & 0.523 & 0.414 & 0.455 & 0.343 & 0.424 & 0.422 & 0.436 & 0.352 \\
- & {\fontsize{7}{8}\selectfont $\pm 0.015$} & {\fontsize{7}{8}\selectfont $\pm 0.014$} & {\fontsize{7}{8}\selectfont $\pm 0.012$} & {\fontsize{7}{8}\selectfont $\pm 0.006$} & {\fontsize{7}{8}\selectfont $\pm 0.009$} & {\fontsize{7}{8}\selectfont $\pm 0.030$} & {\fontsize{7}{8}\selectfont $\pm 0.004$} & {\fontsize{7}{8}\selectfont $\pm 0.003$} &  \\
+\multirow{2}{*}{\textbf{\shortstack{Target-\\fitted}}} & DECIPHER Ctr. & 0.402 & 0.416 & 0.476 & 0.331 & 0.483 & 0.465 & 0.469 & 0.434 & 0.037 \\
+ & DECIPHER Ctx. & 0.475 & 0.523 & 0.414 & 0.455 & 0.343 & 0.424 & 0.422 & 0.436 & 0.352 \\
 \arrayrulecolor{black}\bottomrule\arrayrulecolor[gray]{0.76}
 \end{tabular*}
 \arrayrulecolor{black}

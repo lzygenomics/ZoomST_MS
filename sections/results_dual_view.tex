@@ -3,40 +3,26 @@
 
 Zero-shot transfer remains a challenge for pretrained models in single-cell biology~\citep{kedzierska2025zeroshot}. We therefore evaluate ZoomST on eight MOSTA sections excluded from pretraining, comparing whole-section clustering of frozen molecular, spatial, and joint features with atlas annotations (Appendix~\ref{app:dual-view}).
 
-Joint ZoomST features achieve higher AMI than the evaluated public pretrained baselines on every held-out section and remain competitive with target-fitted spatial methods (Table~\ref{tab:representation-summary}a).
+Joint ZoomST features achieve higher AMI than the evaluated public pretrained baselines on every held-out section and remain competitive with target-fitted spatial methods (Table~\ref{tab:representation-summary}a; Figure~\ref{fig:dual-view-e125}). We next test whether physical neighbors remain close in the learned features, connecting anatomical recognition to local tissue organization. Joint features achieve the highest mean neighbor retention among the evaluated methods, preserving the spatial view's advantage alongside anatomical agreement (Table~\ref{tab:representation-summary}b; Figure~\ref{fig:dual-view-retention}).
 
-\begin{table}[p]
+The held-out Brain case further illustrates how the two views complement each other (Figure~\ref{fig:dual-view-brain}). Molecular features recover most Brain positions but include neighboring tissue; spatial features make fewer extra assignments but miss part of the Brain. Combining the views reduces this tradeoff and improves Brain delineation.
+
+An independently pretrained human ZoomST model shows similar advantages in anatomical agreement and local neighbor retention across the seven held-out HESTA sections (Table~\ref{tab:hesta-representation-summary}).
+
+
+
+\begin{table}[!tbp]
 \centering
-\caption{\textbf{Tissue mapping and neighbor retention on eight held-out MOSTA sections.} \textbf{(a)} AMI means, with SD over downstream clustering initializations below. \textbf{(b)} Physical 32-neighbor retention. Summary scores weight sections equally. Bold marks the three highest scores in each metric column. Protocols: Appendix~\ref{app:dual-view}.}
-\label{tab:representation-summary}
-\label{tab:dual-view-sections}
-\begingroup
-\fontsize{9}{10}\selectfont
-\setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{0.88}
-\input{tables/representation_summary_compact}
-\endgroup
-\par\vspace{6pt}
-\caption{\textbf{Tissue mapping and neighbor retention on seven held-out HESTA sections.} Readouts follow Table~\ref{tab:representation-summary}, with SD over downstream clustering initializations. Protocols: Appendix~\ref{app:dual-view}.}
+\caption{\textbf{Tissue mapping and neighbor retention on seven held-out HESTA sections.} Readouts, abbreviations, and highlighting follow Table~\ref{tab:representation-summary}. Protocols: Appendix~\ref{app:dual-view}.}
 \label{tab:hesta-representation-summary}
+\begin{minipage}{0.90\linewidth}
 \begingroup
-\fontsize{9}{10}\selectfont
+\fontsize{8}{9}\selectfont
 \setlength{\tabcolsep}{1.2pt}
-\renewcommand{\arraystretch}{0.88}
+\setlength{\aboverulesep}{0.2ex}
+\setlength{\belowrulesep}{0.3ex}
+\renewcommand{\arraystretch}{1.04}
 \input{tables/hesta_representation_summary}
 \endgroup
+\end{minipage}
 \end{table}
-
-We next test whether physical neighbors remain close in the learned features, connecting anatomical recognition to local tissue organization. Joint features retain these neighborhoods more strongly than the evaluated baselines, preserving the spatial view's advantage alongside anatomical agreement (Table~\ref{tab:representation-summary}b). Section-wise results show how this correspondence varies across held-out tissues (Figure~\ref{fig:dual-view-retention}).
-
-Whole-section maps show how recovered assignments correspond spatially to atlas-defined compartments in E12.5 E2S1 (Figure~\ref{fig:dual-view-e125}). The held-out E16.5 E2S13 Brain case illustrates complementary errors (Figure~\ref{fig:dual-view-brain}). Molecular features recover most Brain positions but include neighboring tissue; spatial features make fewer extra assignments but miss part of the Brain. Combining the views reduces this tradeoff and improves Brain delineation.
-
-An independently pretrained human ZoomST model shows the same advantages in anatomical agreement and local neighbor retention across held-out HESTA sections (Table~\ref{tab:hesta-representation-summary}).
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=\linewidth]{figures/brain_complementarity.pdf}
-\caption{\textbf{Complementary molecular and spatial errors on a held-out section.} Annotation, molecular, spatial, and joint Brain assignments in E16.5 E2S13. Blue: correct assignments; orange: extra assignments; magenta: missed Brain.}
-\label{fig:dual-view-brain}
-\end{figure}
-\FloatBarrier

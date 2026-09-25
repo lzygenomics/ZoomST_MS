@@ -1,5 +1,22 @@
 \section{Discussion and conclusion}
 
-ZoomST treats relationships between observation granularities as a learnable component of spatial transcriptomic pretraining. Molecular--spatial learning retains tissue descriptions within each granularity, while nested-neighborhood supervision links these descriptions through soft distributional equivariance. The experiments show two complementary outcomes. Frozen representations transfer anatomical information to held-out sections; cross-granularity supervision enriches coarse developmental ordering and strengthens the similarity structure shared across granularities. At the same time, fine and coarse descriptions retain different anatomical uses, supporting their separate availability rather than treating them as interchangeable representations.
+ZoomST treats relationships between observation granularities as a
+learnable component of spatial transcriptomic pretraining.
+Molecular--spatial learning retains tissue descriptions within each
+granularity, while nested-neighborhood supervision links these
+descriptions through soft distributional equivariance.
+In mouse and human developmental atlases, frozen representations
+support anatomical transfer, while cross-granularity supervision
+enriches developmental information.
 
-The learned relationships are also directly queryable. Transformations predict coarse states on new sections and intermediate states at granularities absent from training. Their responses identify relative differences in encoded change across held-out locations. Anatomical analyses connect these differences both to changing neighborhood composition and to molecular-context variation within a broad tissue label. By learning useful descriptions together with predictive relationships between them, ZoomST makes observation granularity a source of self-supervision and an axis for analyzing spatial context dependence.
+Importantly, linking granularities does not make their descriptions
+interchangeable: fine and coarse context retain distinct anatomical uses.
+This motivates querying how a location's description changes with
+observation range.
+On held-out mouse sections, the learned transformations predict
+representations at unseen intermediate granularities and support
+comparisons of relative context sensitivity.
+Anatomical analyses relate these responses to both composition changes
+and molecular-context variation within an anatomical compartment.
+ZoomST thus makes observation granularity both a source of
+self-supervision and an axis for analyzing spatial context dependence.

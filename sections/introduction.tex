@@ -23,18 +23,23 @@ Spatial representation methods typically characterize tissue context within a pr
 Existing pretraining objectives provide limited supervision for learning these transformations. Single-cell pretraining commonly predicts masked genes or expression values from molecular context within a cell~\citep{theodoris2023geneformer,cui2024scgpt}, while spatial predictive objectives incorporate neighboring cells to recover molecular information or latent cell states~\citep{zhao2025stofm,liu2026cellworld}. These objectives primarily learn what can be inferred within a given context, rather than how representations vary with spatial scale. Organizing scale-specific representations within a shared latent space makes their common and scale-dependent characteristics directly comparable, while modeling transformations between them extends representation learning beyond a few predefined scales toward continuously varying spatial contexts. This enables a more fine-grained characterization of how tissue context changes with spatial scale.
 
 
-We introduce ZoomST, a self-supervised pretraining framework for spatial transcriptomics that learns scale-specific tissue representations together with their structured relationships across spatial scales. We design a soft distributional equivariance constraint that imposes structured consistency across scale-specific representations within a shared latent space while preserving scale-dependent tissue characteristics. Rather than treating multiscale representations as a collection of independent embeddings, ZoomST learns how they transform across spatial scales, forming a structured cross-scale representation space. This enables tissue context to be characterized more continuously and at finer spatial scales beyond a small set of predefined resolutions.
+We introduce ZoomST, a self-supervised pretraining framework for spatial transcriptomics that learns molecular--spatial dual-view representations of tissue context across spatial scales. We design a soft distributional equivariance constraint to learn structured transformations between scale-specific representations within a shared latent space while preserving scale-dependent tissue characteristics. This yields a structured cross-scale representation space that extends beyond a discrete set of embeddings at predefined spatial granularities, enabling tissue context to be characterized continuously across spatial granularities.
 
 We evaluate both the representations and their transformations in developmental spatial transcriptomic atlases. Our main contributions are:
 
+\begingroup
+\setlength{\leftmargini}{1.3em}
 \begin{itemize}
-\item \textbf{Learning cross-granularity transformations during pretraining.}
-We formulate changes in observation granularity as a prediction task and jointly learn the tissue representations and transformations that connect them. Nested observations provide cross-granularity supervision through soft distributional equivariance, alongside molecular--spatial learning within each granularity.
+\item \textbf{Molecular--spatial dual-view pretraining for tissue representation.}
+We develop a self-supervised pretraining framework that jointly learns molecular and spatial views of tissue context across multiple spatial scales, and provides scale-specific representations in a shared latent space.
 
-\item \textbf{Generalization to held-out tissue sections.}
-Frozen representations support tissue mapping and preserve developmental ordering within Brain on held-out mouse sections spanning all sampled developmental stages. For tissue mapping, they outperform the evaluated pretrained baselines and remain competitive with target-fitted methods. Learned transformations also predict directly encoded coarse representations on these sections. Anatomical analysis illustrates complementary uses of fine and coarse context.
+\item \textbf{Soft distributional equivariance for structured cross-scale learning.}
+We introduce a soft distributional equivariance constraint that imposes cross-scale consistency within a shared latent space while preserving scale-dependent tissue characteristics. This enables ZoomST to learn structured transformations between representations rather than treating different scales as independent embeddings.
 
-\item \textbf{Prediction at unseen intermediate granularities.}
-We jointly train the encoder and continuous transformation using only discrete granularities. With both frozen on held-out sections, the transformation predicts directly encoded representations at unseen intermediate ranges. These predictions also capture relative differences in context sensitivity across tissue locations.
+\item \textbf{Continuous cross-scale transformation and scale sensitivity.}
+The learned transformations interpolate tissue representations at unseen intermediate spatial scales despite supervision at only a discrete set of scales. They further provide a means to characterize how strongly tissue representations respond to changes in spatial context, revealing spatial variation in scale sensitivity.
 
+\item \textbf{Generalization across developmental spatial transcriptomic atlases.}
+We validate ZoomST on human and mouse developmental atlases. Frozen representations generalize to held-out tissue sections and support downstream tasks including tissue mapping and developmental organization, outperforming the evaluated pretrained baselines on tissue mapping while remaining competitive with target-fitted methods.
 \end{itemize}
+\endgroup

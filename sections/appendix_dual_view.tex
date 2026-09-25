@@ -10,7 +10,7 @@ The displayed Molecular View, Spatial View, and Joint refer to three readouts of
 Scores use the same eligible positions for every method within each benchmark: all positions for MOSTA and the common valid cohort specified below for the HESTA cross-method comparison. Adjusted mutual information (AMI) and adjusted Rand index (ARI) measure chance-adjusted agreement between the cluster partition and the atlas annotation. One-to-one maximum-overlap Hungarian matching assigns anatomical labels to clusters for the maps and class-specific IoU. For class $c$, $\operatorname{IoU}_c=\operatorname{TP}_c/(\operatorname{TP}_c+\operatorname{FP}_c+\operatorname{FN}_c)$. AMI and ARI are invariant to the matching. Section-level scores are averaged with equal section weights.
 
 \paragraph{Target-fitted spatial methods.}
-GraphST, BANKSY, MENDER, and STAGATE~\citep{long2023graphst,singhal2024banksy,yuan2024mender,dong2022stagate} use each complete target section independently, with expression and coordinates but no anatomical training labels. The model or feature-construction seed is 42; each fixed representation is then clustered with seeds 42, 43, and 44. Tables group these target-fitted methods separately from frozen pretrained representations.
+GraphST, BANKSY, MENDER, and STAGATE~\citep{long2023graphst,singhal2024banksy,yuan2024mender,dong2022stagate} use each complete target section independently, with expression and coordinates but no anatomical training labels. Each fixed representation uses the shared clustering protocol above. Tables group these target-fitted methods separately from frozen pretrained representations.
 
 GraphST and STAGATE select 3,000 highly variable genes by Seurat-v3 on raw counts, followed by counts-per-10,000 normalization and log1p. GraphST additionally applies noncentered gene scaling clipped at 10. GraphST uses its Stereo-seq three-neighbor graph and a sparse implementation of the native objective, with 600 epochs, learning rate 0.001, and hidden dimension 64. The readout uses its normalized reconstructed-gene output. STAGATE uses the official PyG model, a symmetrized six-neighbor graph with self loops, hidden dimensions 512 and 30, 1,000 epochs, learning rate 0.001, weight decay 0.0001, and gradient clipping at 5. It uses the full section graph without an annotation-derived auxiliary graph.
 
@@ -23,12 +23,12 @@ Table~\ref{tab:hesta-representation-summary} uses the independently pretrained h
 
 CellWorld-base~\citep{liu2026cellworld} receives raw counts normalized to 10,000 per position, followed by log1p and selection of 300 highly variable genes per section. We use Scanpy's Seurat-dispersion selection with 20 bins and no batch key. Its native tokenizer and normalized-coordinate Hilbert ordering form contexts of 4,096 positions; unknown organ and platform identifiers are set to zero. The encoder remains frozen. All native feature construction uses unlabeled section data; the common cohort and shared standardization, PCA32, and clustering readout are then applied. Public models retain their original pretraining corpora; exposure to individual HESTA target sections is not established here.
 
-DECIPHER~\citep{xia2025decipher} is fitted independently on each target section without anatomical labels, yielding its native 32-dimensional Center and Context representations. Version 0.3.2 selects 2,000 Seurat-v3 highly variable genes from counts, normalizes to 10,000, applies log1p, and scales with clipping at 10. The minimum gene count per position is zero to retain the evaluation rows; genes require three expressing positions. The native spatial graph uses 20 neighbors. Both training stages use seed 42, batch size 256, and a limit of five epochs or 10,000 updates, whichever occurs first. The molecular encoder uses a 256-unit hidden layer and learning rate 0.001; the spatial encoder uses three single-head transformer layers and learning rate 0.0001. Both use weight decay $10^{-5}$. Standardization and PCA32 precede the shared readouts.
+DECIPHER~\citep{xia2025decipher} is fitted independently on each target section without anatomical labels, yielding its native 32-dimensional Center and Context representations. Version 0.3.2 selects 2,000 Seurat-v3 highly variable genes from counts, normalizes to 10,000, applies log1p, and scales with clipping at 10. The minimum gene count per position is zero to retain the evaluation rows; genes require three expressing positions. The native spatial graph uses 20 neighbors. Both training stages use batch size 256, and a limit of five epochs or 10,000 updates, whichever occurs first. The molecular encoder uses a 256-unit hidden layer and learning rate 0.001; the spatial encoder uses three single-head transformer layers and learning rate 0.0001. Both use weight decay $10^{-5}$. Standardization and PCA32 precede the shared readouts.
 
 The compact table labels Nbh., S-cell, Ctr., and Ctx. denote Neighborhood, Spatial-cell, Center, and Context, respectively. Molecular and Spatial denote the two ZoomST views defined above.
 
 \paragraph{Whole-section anatomical results.}
-Tables~\ref{tab:representation-summary} and~\ref{tab:hesta-representation-summary} report AMI for eight MOSTA and seven HESTA sections, respectively; Table~\ref{tab:representation-secondary-ari} reports MOSTA ARI from the same three clustering runs. Entries are the mean and sample standard deviation (denominator $3-1$) across three downstream clustering runs with different initializations. For each atlas's summary, sections are averaged equally within each clustering run before computing the mean and standard deviation. These standard deviations quantify clustering variability with fixed representations and sections. Bold marks the top three unrounded values in each comparison, including exact third-place ties. Joint ZoomST features have the highest mean MOSTA ARI (0.345).
+Tables~\ref{tab:representation-summary} and~\ref{tab:hesta-representation-summary} report mean AMI across three downstream clustering initializations for eight MOSTA and seven HESTA sections, respectively. Table~\ref{tab:representation-secondary-ari} reports MOSTA ARI from the same runs, including sample standard deviations (denominator $3-1$). For each atlas's summary, sections are averaged equally within each clustering run before averaging the runs. Reported standard deviations quantify clustering variability with fixed representations and sections. Bold marks the top three unrounded values in each comparison, including exact third-place ties. Joint ZoomST features have the highest mean MOSTA ARI (0.345).
 
 \begin{table}[t]
 \centering\small
@@ -40,11 +40,11 @@ Tables~\ref{tab:representation-summary} and~\ref{tab:hesta-representation-summar
 \end{table}
 
 \paragraph{Granularity-specific anatomical ablation.}
-At each $k\in\{8,32,128\}$, Joint concatenates $e_k$ and $g_k$ and uses the whole-section standardization, PCA32, and three-seed clustering protocol above. HESTA uses its coarse anatomical labels and all 1,129,287 positions across the seven sections. Both HESTA models' exported features pass through float16 and then float32 before feature preprocessing, giving them common stored precision. Table~\ref{tab:cross-granularity-ami}a reports the mean and sample SD of equal-section means across the three downstream clustering runs. Its improvement counts compare the models after averaging these runs within each held-out section. Table~\ref{tab:cross-granularity-ami-sections} gives these paired section means.
+At each $k\in\{8,32,128\}$, Joint concatenates $e_k$ and $g_k$ and uses the whole-section standardization, PCA32, and three-seed clustering protocol above. HESTA uses its coarse anatomical labels and all 1,129,287 positions across the seven sections. Both HESTA models' exported features pass through float16 and then float32 before feature preprocessing, giving them common stored precision. Table~\ref{tab:cross-granularity-ami}a reports the mean of equal-section means across the three downstream clustering runs. Section-level gains compare the models after averaging these runs within each held-out section. Table~\ref{tab:cross-granularity-ami-sections} gives these paired section means.
 
 \begin{table}[!htbp]
 \centering\small
-\caption{\textbf{Joint AMI on every held-out section and granularity.} Each value averages downstream clustering runs with seeds 42, 43, and 44; bold marks the higher unrounded value within each section--granularity pair.}
+\caption{\textbf{Joint AMI on every held-out section and granularity.} Each value averages the three downstream clustering runs; bold marks the higher unrounded value within each section--granularity pair.}
 \label{tab:cross-granularity-ami-sections}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.08}
@@ -66,46 +66,51 @@ The E12.5 E2S1 display uses all 23,640 positions and the same 18-class \texttt{a
 
 The E16.5 E2S13 Brain display uses all positions in the section, without smoothing or interpolation. Molecular features produce 504 extra and 74 missed Brain assignments; spatial features produce 60 extra and 373 missed assignments; joint features produce 77 extra and 97 missed assignments. These maps use the seed-42 run included in the three-seed quantitative evaluation.
 
-\begin{figure}[p]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\linewidth]{figures/e125_full_section.pdf}
-\caption{\textbf{Whole-section tissue mapping in E12.5 E2S1.} The annotation and seven-method predictions share all 23,640 positions and 18 primary classes. Maximum-overlap one-to-one matching assigns anatomical colors. The top row contains annotation and frozen pretrained features; the lower row contains target-fitted methods. Maps use seed 42, with no smoothing or label interpolation.}
+\caption{\textbf{Example case: whole-section tissue mapping in E12.5 E2S1.} The annotation and seven-method predictions share all 23,640 positions and 18 primary classes. Maximum-overlap one-to-one matching assigns anatomical colors. The top row contains annotation and frozen pretrained features; the lower row contains target-fitted methods. Maps use no smoothing or label interpolation.}
 \label{fig:dual-view-e125}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/brain_complementarity.pdf}
+\caption{\textbf{Complementary molecular and spatial errors on a held-out section.} Annotation, molecular, spatial, and joint Brain assignments in E16.5 E2S13. Blue: correct assignments; orange: extra assignments; magenta: missed Brain.}
+\label{fig:dual-view-brain}
+\end{figure}
+
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=\linewidth]{figures/spatial_retention_multiview.pdf}
 \caption{\textbf{Local neighbor retention in the tissue-mapping representations.} Markers show physical 32-neighbor recovery over 2,048 fixed queries per section; all positions are candidates and self is excluded. Colored lines connect the same section within each method group, and black diamonds mark equal-section means. ZoomST $g$ and $e$ each concatenate granularities 8, 32, and 128; joint concatenates both views. All three use the same standardized PCA features as Table~\ref{tab:representation-summary}. Frozen pretrained representations and target-fitted spatial methods are grouped separately.}
 \label{fig:dual-view-retention}
 \end{figure}
 
-\FloatBarrier
-
 \subsection{Developmental ordering and stage prediction within Brain}
 \label{app:developmental-ordering}
 
 MOSTA Brain is selected by coverage across all eight stages and the minimum available stage count. DPT uses the same 589 Brain observations from each held-out section, for 4,712 observations in total. HESTA Brain has sufficient coverage at CS17, CS18, CS19, CS20, and CS23; we fix 512 observations from each section, for 2,560 in total. Models share the same positions within each atlas. ZoomST and No Cross use the frozen models and Joint features defined in Appendix~\ref{app:dual-view}; the cross-method MOSTA comparison additionally uses Novae and SToFM's frozen embeddings and the shared-fit baselines below.
 
-Table~\ref{tab:cross-granularity-development}b evaluates Joint separately at each context size $k\in\{8,32,128\}$. Within each atlas, DPT uses the same balanced Brain cohort, centered pooled PCA with 32 components and no featurewise standardization, a 30-neighbor graph, and a fixed root for all six model--scale combinations. Each developmental stage is represented by one held-out section. Table~\ref{tab:joint-scale-comparison} additionally retains the MOSTA whole-section anatomical and physical-neighbor readouts alongside DPT.
+Table~\ref{tab:cross-granularity-development}b evaluates Joint separately at each context size $k\in\{8,32,128\}$. Within each atlas, all six model--scale combinations use the same balanced Brain cohort, 30 neighbors, and a fixed root. Each developmental stage is represented by one held-out section. Table~\ref{tab:joint-scale-comparison} additionally retains the MOSTA whole-section anatomical and physical-neighbor readouts alongside DPT.
 
 \paragraph{Shared representations across sections.}
 For the cross-method MOSTA comparison, GraphST and STAGATE each fit one encoder jointly across all eight target sections with shared gene selection and separate within-section spatial graphs. BANKSY uses a common 3,000-gene panel, and MENDER uses a common codebook of 32 unsupervised expression states. These fits use the complete target sections before extracting the balanced Brain observations. Other feature-construction and model-training settings follow Appendix~\ref{app:dual-view}.
 
 \paragraph{Pseudotime.}
-The Novae, SToFM, GraphST, STAGATE, BANKSY, and MENDER embeddings undergo columnwise z-score standardization before pooled PCA. PCA is fitted on the pooled Brain observations with 32 components; STAGATE retains its native 30 dimensions. Euclidean nearest-neighbor graphs are constructed with RAPIDS single-cell, followed by diffusion mapping and diffusion pseudotime (DPT)~\citep{haghverdi2016dpt}. The GPU implementation uses Scanpy's default DPT distance definition with ten diffusion components.\footnote{\url{https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.dpt.html}} The neighborhood size is $k=30$. STAGATE and BANKSY use $k=50$ to connect their graphs; MENDER is also evaluated at $k=50$. The remaining DPT settings are shared. The root is the same E9.5 observation nearest the spatial centroid of the sampled E9.5 Brain domain. Sampling and numerical routines use random seed 42. Root distances are normalized by the largest finite distance within each method; all observations have finite pseudotime under the reported settings.
+External baselines in both atlases share featurewise z-score standardization over the pooled Brain cohort, followed by PCA32 (STAGATE retains its native 30 dimensions). DPT~\citep{haghverdi2016dpt} uses Euclidean neighbor graphs and Scanpy's default distance definition with ten diffusion components.\footnote{\url{https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.dpt.html}} The default neighborhood size is 30. To address DPT computation failures, we expand the graph to 50 neighbors for STAGATE, BANKSY, and MENDER on MOSTA. Other DPT settings are shared. The MOSTA root is the E9.5 observation nearest the spatial centroid of the sampled E9.5 Brain domain. Sampling and numerical routines use seed 42. Root distances are normalized by the largest finite distance within each method; all selected MOSTA observations have finite pseudotime under the reported settings.
 
 \paragraph{Pseudotime--stage agreement.}
 For observation $i$, let $t_i$ denote pseudotime and $s_i$ its measured developmental stage. Spot-level Spearman correlation is $\operatorname{Spearman}(t_i,s_i)$ over all selected observations in an atlas, using unrounded pseudotimes and average ranks for ties. The observations span eight MOSTA stages or five HESTA stages. Figure~\ref{fig:developmental-ordering} reports both atlases; Table~\ref{tab:developmental-ordering} retains the combined-granularity MOSTA values.
 
-HESTA uses the same centered PCA32, 30-neighbor graph, and ten-component Scanpy DPT definition for both models. The root is the first observation in the sorted sampled CS17 indices, fixed before evaluating the scores; its distances are normalized by the largest finite distance. All Brain observations have finite pseudotime. Carnegie stage numbers specify the ordered target. PCA and graph construction pool the unlabeled Brain observations within each atlas; stage labels anchor the earliest-stage root and evaluate the resulting order.
+For HESTA, the root is the first observation in the sorted sampled CS17 indices, fixed before evaluating the scores; its distances are normalized by the largest finite distance. ZoomST and No Cross have finite pseudotime for all selected Brain observations. Carnegie stage numbers specify the ordered target. PCA and graph construction pool the unlabeled Brain observations within each atlas; stage labels anchor the earliest-stage root and evaluate the resulting order.
 
 \paragraph{HESTA cross-method comparison.}
-The HESTA panel uses the same 2,560 Brain observations and CS17 root. ZoomST concatenates $e_8,e_{32},e_{128},g_8,g_{32},g_{128}$ and applies centered PCA32. Frozen external representations comprise Novae, SToFM, scGPT-spatial, the Cell, Neighborhood, and Spatial-cell outputs of TERRA, and CellWorld. Each external representation undergoes featurewise z-score standardization over the pooled Brain cohort before PCA32. Every method uses 30 neighbors and the same ten-component Scanpy DPT distance rule. CellWorld uses its frozen CP10K/log1p and per-section Seurat-HVG300 export. Its 512 CS18 observations are disconnected from the common root, so the figure marks its complete-stage readout as NA. The remaining methods cover all five stages. The existing independently fitted per-section DECIPHER embeddings are not pooled into a shared cross-stage coordinate system.
+The HESTA panel uses the same 2,560 Brain observations and CS17 root. Frozen external representations comprise Novae, SToFM, scGPT-spatial, the Cell, Neighborhood, and Spatial-cell outputs of TERRA, and CellWorld. They follow the standardization and DPT protocol above, with 30 neighbors for every method. CellWorld uses its frozen CP10K/log1p and per-section Seurat-HVG300 export. Its 512 CS18 observations are disconnected from the common root, so the figure marks its complete-stage readout as NA. The remaining methods cover all five stages. The existing independently fitted per-section DECIPHER embeddings are not pooled into a shared cross-stage coordinate system.
 
 \begin{table}[!htbp]
 \centering\scriptsize
-\caption{\textbf{MOSTA Joint readouts by granularity.} AMI uses the same downstream clustering mean and SD aggregation as Table~\ref{tab:cross-granularity-ami}a. Neighbor retention is equal-section physical 32-neighbor recovery. Spot-level correlation uses the 4,712-observation Brain cohort. Bold marks the higher value in each pair, including ties.}
+\caption{\textbf{MOSTA Joint readouts by granularity.} AMI means follow Table~\ref{tab:cross-granularity-ami}a; SD is the sample SD across three downstream clustering runs. Neighbor retention is equal-section physical 32-neighbor recovery. Spot-level correlation uses the 4,712-observation Brain cohort. Bold marks the higher value in each pair, including ties.}
 \label{tab:joint-scale-comparison}
 \setlength{\tabcolsep}{2.2pt}
 \renewcommand{\arraystretch}{1.18}

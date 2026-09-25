@@ -53,7 +53,7 @@ Held-out sections & Table~\ref{tab:heldout-inventory} lists eight MOSTA and seve
 Anatomical analyses & Regional IoU and neighborhood geometry use all 43 regions in the eight held-out sections, with annotation-balanced clustering fits and full-section scoring (Appendix~\ref{app:region-scale}). E14.5 E1S1 (granularity and Facial nerve cases) and E16.5 E1S1 (state and context-response cases) belong to the training set. The E12.5 E2S1 whole-section map and E16.5 E2S13 Brain mapping display use held-out sections. \\
 Developmental ordering & Stage-balanced Brain observations from the held-out sections evaluate pseudotime--stage agreement. Sampling, shared baseline fits, and spot-level correlation are specified in Appendix~\ref{app:developmental-ordering}. \\
 Stage prediction & Frozen Brain representations enter a linear readout. Each fold fits feature standardization and regression on the other sections, using their stage labels, then evaluates one entire section. MAE averages sections equally (Appendix~\ref{app:developmental-ordering}). \\
-Response summaries & Direct-encoding analyses use eight training E1S1 sections and eight holdouts. Section--domain--range summaries combine both groups; the high--low response comparison reports the eight holdouts separately. \\
+Response summaries & High--low response comparisons use the eight held-out sections. Anatomical cases use the training sections identified above; directly encoded changes and neighborhood composition provide evaluation references. \\
 Objective ablation & MOSTA No Cross, CS, and ZoomST share initialization, training data, and training budget, differing only in their loss terms. Frozen evaluation follows the held-out protocols in Section~\ref{sec:developmental-information} and Appendix~\ref{app:objective-ablation}. \\
 Aggregation & Section summaries receive equal weight. Position-level distributions describe within-section variation; queries, projections, shuffles and batches specify sampling and numerical averaging. \\
 \bottomrule
@@ -72,11 +72,11 @@ Novae uses the public mouse-0 weights, and SToFM uses its public checkpoint with
 \label{app:region-scale}
 
 \paragraph{Regional readout.}
-Table~\ref{tab:regional-spatial-iou-full} uses all annotated regions in each of the eight held-out sections: 43 distinct regions and 137 section--region observations. ZoomST Spatial at granularities 8, 32, and 128 and the six external methods use the frozen representations and full-section feature transforms specified in Appendix~\ref{app:dual-view}. Each ZoomST Spatial representation is standardized per feature dimension and projected separately to 32 principal components. External methods retain their original feature preprocessing, including BANKSY's weighted representation with $\lambda=0.8$ and no second feature standardization. These feature coordinates remain fixed during the regional readout.
+The regional analysis uses all annotated regions in each of the eight held-out sections: 43 distinct regions and 137 section--region observations. ZoomST Spatial at granularities 8, 32, and 128 and the six external methods use the frozen representations and full-section feature transforms specified in Appendix~\ref{app:dual-view}. Each ZoomST Spatial representation is standardized per feature dimension and projected separately to 32 principal components. External methods retain their original feature preprocessing, including BANKSY's weighted representation with $\lambda=0.8$ and no second feature standardization. These feature coordinates remain fixed during the regional readout.
 
-For each section and clustering seed, we sample without replacement the same number of positions from every annotated class, using the size of the smallest class. All methods and granularities share these sampled indices and their shuffled order. MiniBatchKMeans fits these balanced positions with the number of clusters set to the section's annotation count, k-means++ initialization, ten initializations, batch size 4,096, at most 300 iterations, and no-improvement limit ten. It then predicts all original positions in the section, including the fitting positions. A global one-to-one Hungarian assignment maximizes cluster--annotation overlap on the full section, and region-wise IoU is computed from all positions. Seeds 42, 43, and 44 repeat the sampling and clustering.
+For each section and clustering seed, we sample without replacement the same number of positions from every annotated class, using the size of the smallest class. All methods and granularities share these sampled indices and their shuffled order. MiniBatchKMeans fits these balanced positions with the number of clusters set to the section's annotation count, k-means++ initialization, ten initializations, batch size 4,096, at most 300 iterations, and no-improvement limit ten. It then predicts all original positions in the section, including the fitting positions. A global one-to-one Hungarian assignment maximizes cluster--annotation overlap on the full section, and region-wise IoU is computed from all positions. Sampling and clustering are repeated with the three downstream seeds specified in Appendix~\ref{app:dual-view}.
 
-We first average the three seeds within each section--region observation, then report the mean and sample SD across the sections containing that region. A region present in one section has one reported value. The final table row equally averages the 43 region means and reports their sample SD. Rows are ordered by each region's mean neighborhood homogeneity across its available sections.
+We first average the three seeds within each section--region observation, then report the mean and sample SD across the sections containing that region. A region present in one section has one reported value. Table~\ref{tab:regional-spatial-iou} presents selected examples of coarse- and fine-context preferences.
 
 \begin{samepage}
 \paragraph{Neighborhood geometry and scale preference.}
@@ -90,10 +90,17 @@ B_8(R) &= \frac{1}{|R|}\sum_{i\in R}\mathbf{1}\!\left[\exists j\in N_8(i):y_j\ne
 \end{samepage}
 $H_{128}$ measures local annotation homogeneity; $B_8$ is the fraction of positions touching a different annotated region within their eight-neighbor window. The geometry is computed before any clustering-fit subsampling. For each section--region observation, the coarse-scale gain is $\Delta\mathrm{IoU}=\mathrm{IoU}_{128}-\mathrm{IoU}_{8}$, using the seed-averaged Spatial scores. Figure~\ref{fig:region-geometry} shows all 137 observations and pooled least-squares trend lines. Spearman correlations use average ranks for tied values. We report both the pooled correlations ($0.470$ for $H_{128}$ and $-0.408$ for $B_8$) and the equal-weight mean of the eight within-section correlations ($0.409$ and $-0.337$). Positive homogeneity correlations and negative boundary correlations each occur in seven of eight sections.
 
-\input{tables/region_spatial_iou_full}
+\input{tables/region_spatial_iou}
 
 \paragraph{Source-section anatomical illustration.}
 The Lung and Smooth muscle maps in Figure~\ref{fig:results1-mosta} illustrate how context interacts with regional shape. In their fixed visceral domain, Lung IoU increases from 0.894 at granularity 8 to 0.955 at 128. Smooth muscle's narrow bands and rings are better separated at granularity 8, with IoU 0.779 compared with 0.580 at 128.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{figures/mosta_lung_smooth_muscle.pdf}
+\caption{\textbf{Broad Lung regions and narrow Smooth muscle favor different granularities.} Annotation, $g_8$, and $g_{128}$ assignments use identical positions and readouts in MOSTA E14.5 E1S1, a training-section illustration. Blue marks correct assignments, orange extra assignments, and magenta missed targets. Both granularities use the same 14,400-position visceral domain and clustering readout.}
+\label{fig:results1-mosta}
+\end{figure}
 
 The anatomical granularity analysis uses E14.5 E1S1 and the frozen MOSTA model defined in Section~\ref{sec:experiments}. Its 102,519 measured positions supply neighborhood context; scoring uses the fixed union of Heart (2,952), Lung (2,011), Liver (6,015), GI tract (1,260), Smooth muscle (1,737), and Pancreas (425). Each output is standardized and projected by full-SVD PCA 32 on these 14,400 positions. MiniBatchKMeans uses six clusters, batch size 2,048, three initializations, at most 200 iterations, no-improvement limit 30, and seed 42. Atlas annotations define the domain, cluster count, post-hoc maximum-overlap one-to-one assignment, and scores. They do not fit the feature transform or clustering.
 
@@ -109,19 +116,14 @@ TP counts correct assignments, FP extra assignments, and FN missed targets.
 
 Adjusted mutual information (AMI) measures the information shared by cluster and annotation assignments after subtracting chance mutual information and dividing by mean marginal entropy minus that same chance expectation. The adjusted Rand index (ARI) measures chance-corrected agreement in whether pairs of positions share a class. Both are invariant to cluster renaming.
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.83\linewidth]{figures/mosta_lung_smooth_muscle.pdf}
-\caption{\textbf{Broad Lung regions and narrow Smooth muscle favor different granularities.} Annotation, $g_8$, and $g_{128}$ predictions use identical positions and readouts in MOSTA E14.5 E1S1, an anatomical case from the training set. Blue marks correct targets, orange extra inclusions, and magenta missed targets. IoU uses all 14,400 task positions and clustering seed 42.}
-\label{fig:results1-mosta}
-\end{figure}
+
 \FloatBarrier
 
 \input{sections/appendix_dual_view}
 
 \input{sections/appendix_granularity_transfer}
 
-\clearpage
+\FloatBarrier
 \input{sections/appendix_scale_continuum}
 \input{sections/appendix_scale_case_figure}
 

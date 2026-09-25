@@ -3,16 +3,13 @@
 
 We compare No Cross, CS, and ZoomST using a common initialization, the same training data and training budget, and identical training settings apart from the loss terms. No Cross uses within-granularity learning; CS adds coarse-support supervision; ZoomST further adds JointMMD. Evaluation uses frozen encoders and the held-out MOSTA split from Section~\ref{sec:developmental-information}, with identical evaluation observations and readout settings across the three models. All readouts use Joint representations at granularities 8, 32, and 128.
 
-Table~\ref{tab:mosta-objective-ablation}a follows the anatomical clustering, Brain developmental ordering, and stage-prediction protocols in Appendix~\ref{app:dual-view}--\ref{app:developmental-ordering}. Panel (b) measures cross-granularity similarity structure using centered linear CKA~\citep{kornblith2019similarity}. For each model and granularity, we apply featurewise z-score standardization over all positions within each section. We then compute CKA on the same 2,048 positions, selected at evenly spaced original row indices and shared across models and granularities. For the column-centered matrices $X$ and $Y$,
-\[
-\mathrm{CKA}(X,Y)=\frac{\|X^\top Y\|_F^2}{\|X^\top X\|_F\,\|Y^\top Y\|_F}.
-\]
+Table~\ref{tab:mosta-objective-ablation} follows the anatomical clustering, Brain developmental ordering, and stage-prediction protocols in Appendix~\ref{app:dual-view}--\ref{app:developmental-ordering}.
 
-Adding JointMMD to CS reduces stage-prediction MAE and increases spot-level DPT correlation at all three granularities, with the largest gains at granularity 128. AMI increases at granularities 8 and 32 and remains similar at granularity 128. CKA increases for all three granularity pairs, with improvements in 22 of the 24 section--pair comparisons. Together, these results show that JointMMD improves developmental readouts and strengthens the similarity structure shared across granularities.
+Adding JointMMD to CS reduces stage-prediction MAE and increases spot-level DPT correlation at all three granularities, with the largest gains at granularity 128. AMI increases at granularities 8 and 32 and remains similar at granularity 128.
 
 \begin{table}[!htbp]
 \centering
-\caption{\textbf{Controlled objective ablation on MOSTA.} \textbf{(a)} Joint AMI, Brain spot-level DPT--stage Spearman correlation, and Brain stage-prediction MAE. AMI is averaged equally across the eight held-out sections within each clustering run; $\pm$ denotes SD over downstream clustering initializations (seeds 42, 43, and 44). DPT uses the shared 4,712-spot Brain cohort. Stage MAE is in embryonic days and uses the same evaluation folds and equal-section aggregation as Table~\ref{tab:cross-granularity-development}b. \textbf{(b)} Centered linear CKA for the granularity pairs $8\leftrightarrow32$, $8\leftrightarrow128$, and $32\leftrightarrow128$, reported as equal-section mean $\pm$ sample SD across the eight held-out sections. Bold marks the best mean in each column, determined from unrounded values.}
+\caption{\textbf{Controlled objective ablation on MOSTA.} Joint AMI, Brain spot-level DPT--stage Spearman correlation, and Brain stage-prediction MAE. AMI averages the eight held-out sections equally; $\pm$ denotes SD over downstream clustering runs. DPT and stage MAE use the protocols and aggregation of Table~\ref{tab:cross-granularity-development}b. Bold marks the best unrounded mean in each column.}
 \label{tab:mosta-objective-ablation}
 \includegraphics[width=\linewidth]{figures/mosta_objective_ablation.pdf}
 \end{table}

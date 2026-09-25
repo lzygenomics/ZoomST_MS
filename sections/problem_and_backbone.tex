@@ -2,11 +2,11 @@
 \label{sec:method}
 \label{sec:backbone}
 
-\method{} learns tissue descriptions and their cross-granularity transformations from nested observations (Figure~\ref{fig:method}). Molecular--spatial learning retains information within each neighborhood, while a shared continuous transformation predicts how its molecular description changes with the amount of surrounding context.
+In this section, we present the core architecture of ZoomST, illustrated in Figure~\ref{fig:method}. ZoomST is pretrained on nested neighborhoods constructed at multiple spatial scales from spatial transcriptomic data. It combines molecular--spatial representation learning at each scale with structured cross-scale transformations.
 
 \begin{figure}[t]
 \centering
-\resizebox{\linewidth}{!}{\input{figures/method_overview}}
+\resizebox{0.90\linewidth}{!}{\input{figures/method_overview}}
 \caption{\textbf{ZoomST overview.}
 \textbf{a}, Nested neighborhoods share a center and span increasing granularities, here 8, 32 and 128 measured positions.
 \textbf{b}, Molecular and spatial encoders produce representations $e_r$ and $g_r$, aligned by VICReg within each granularity and retained for analysis.
@@ -14,14 +14,21 @@
 \label{fig:method}
 \end{figure}
 
-\subsection{Observation granularity and nested tissue context}
+\subsection{Multi-Granularity Input from Nested Neighborhoods}
 \label{sec:nested-observations}
 
-A tissue section contains expression profiles $x_i$ and coordinates $p_i$ at $N$ measured positions, each representing a cell or spatial bin. Let $S_{i,r}$ contain $i$ and its $r-1$ nearest spatial neighbors. The \emph{observation granularity} $r$ counts the positions summarized around $i$; increasing it expands context on the same measurement grid. Training uses nested supports at $r\in\Rset=\{8,32,128\}$. Their molecular profiles average preprocessed expression, $m_{i,r}=r^{-1}\sum_{j\in S_{i,r}}\bar x_j$. Expanding a support retains shared measurements and adds new context, providing paired observations without anatomical labels.
+A spatial transcriptomic tissue section contains $N$ measured positions indexed by $i\in\{1,\ldots,N\}$. Each position $i$ is associated with a position-level molecular profile $x_i\in\mathbb{R}^{G}$, containing expression measurements over $G$ genes, and a spatial coordinate $p_i\in\mathbb{R}^{2}$. Depending on the spatial transcriptomics platform, a measured position may correspond to a cell, spot, or spatial bin.
 
-\subsection{Molecular--spatial representations within each granularity}
+For each focal position $i$, we construct a nested neighborhood $S_{i,r}$ containing $i$ and its $r-1$ nearest spatial neighbors, where neighborhood size $r$ defines the spatial granularity of the tissue context, with larger $r$ corresponding to broader spatial scales. We use a discrete set of granularities $r\in\mathcal{R}=\{8,32,128\}$, yielding nested tissue contexts centered at the same focal position. The corresponding granularity-level molecular profile is obtained by averaging the preprocessed expression profiles within each neighborhood, $m_{i,r}=\frac{1}{r}\sum_{j\in S_{i,r}}\bar{x}_j$.
+Both position-level and granularity-level molecular profiles are subsequently tokenized into fixed-length sequences of 512 gene tokens, with each token encoding a gene identity and its discretized expression rank, before being passed to the ZoomST encoders.
+
+\subsection{Molecular--Spatial Dual-View Representation Learning}
 \label{sec:within-granularity}
 
-The molecular view is $e_{i,r}=E_{\mathrm{PB}}(\operatorname{Tokenize}(m_{i,r}))\in\mathbb R^d$: a pseudobulk Transformer encodes gene identities and discretized expression values after pooling. The spatial view additionally describes arrangement. A position-wise Transformer supplies states $h_j$; a shared spatial Transformer contextualizes them using relative coordinates and a granularity identifier. A shared DeepSets readout~\citep{zaheer2017deepsets} pools the resulting states into $g_{i,r}\in\mathbb R^d$. Both views have $d=256$. The two molecular Transformers have separate parameters and share gene and expression-bin embeddings.
+At each spatial granularity $r$, ZoomST learns complementary spatial and molecular representations of the same tissue context. For the spatial view, a position-level molecular Transformer first encodes each molecular profile $x_j$, $j\in S_{i,r}$, into a latent state $h_j=E_{\mathrm{pos}}(\mathrm{Tokenize}(x_j))$.
+A shared spatial Transformer then contextualizes these states within $S_{i,r}$ using their relative spatial coordinates and a granularity identifier. The contextualized states are subsequently aggregated by a shared DeepSets encoder~\citep{zaheer2017deepsets} to obtain the spatial representation $g_{i,r}\in\mathbb{R}^{d}$.
 
-Masked expression reconstruction grounds both views in molecular content: $e_{i,r}$ and $g_{i,r}$ reconstruct the pooled neighborhood profile, alongside reconstruction of the focal observation. The combined reconstruction loss $\mathcal L_{\mathrm{rec}}$ and within-granularity VICReg alignment~\citep{bardes2022vicreg} define $\mathcal L_{\mathrm{base}}$. VICReg's variance and covariance terms regularize the aligned states. Both views remain available; transformations act on $e$, whose observation is the pooled molecular profile. Appendices~\ref{app:preprocessing} and~\ref{app:hyperparameters} specify tokenization, architecture and the base objective.
+For the molecular view, the granularity-level molecular profile $m_{i,r}$ is directly encoded by a separate molecular Transformer, $e_{i,r}=E_{\mathrm{gran}}(\mathrm{Tokenize}(m_{i,r}))\in\mathbb{R}^{d}$.
+Both representations use $d=256$. The position-level and granularity-level molecular Transformers have separate parameters while sharing gene and expression-rank embeddings.
+
+The dual-view representations are jointly pretrained through masked expression reconstruction and within-granularity VICReg alignment~\citep{bardes2022vicreg}.
